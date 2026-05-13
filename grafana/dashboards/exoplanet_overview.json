@@ -1,7 +1,7 @@
 {
   "title": "CelestiaOps — Exoplanet Observatory",
   "uid": "celestiaops-observatory",
-  "version": 2,
+  "version": 3,
   "schemaVersion": 38,
   "refresh": false,
   "tags": ["celestiaops", "astronomy"],

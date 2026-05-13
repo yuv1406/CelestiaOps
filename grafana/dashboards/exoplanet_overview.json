@@ -280,7 +280,12 @@
         "format": "table",
         "refId": "A"
       }],
-      "options": { "mapping": "auto", "tooltip": { "mode": "single" } }
+      "options": {
+        "seriesMapping": {
+          "0": { "x": "Radius (R\u2295)", "y": "Mass (M\u2295)" }
+        },
+        "tooltip": { "mode": "single" }
+      }
     },
 
     {
@@ -317,8 +322,8 @@
       "gridPos": { "x": 0, "y": 57, "w": 8, "h": 8 },
       "datasource": { "uid": "celestiaops-timescaledb" },
       "targets": [{ "rawSql": "SELECT pl_orbper AS \"Orbital Period (days)\" FROM exoplanets WHERE pl_orbper IS NOT NULL AND pl_orbper BETWEEN 0.1 AND 1000", "format": "table", "refId": "A" }],
-      "options": { "bucketSize": "auto", "fillOpacity": 70, "gradientMode": "opacity" },
-      "fieldConfig": { "defaults": { "color": { "fixedColor": "blue", "mode": "fixed" }, "custom": { "fillOpacity": 70 } } }
+      "options": { "bucketSize": "auto", "fillOpacity": 70 },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "blue", "mode": "fixed" } } }
     },
 
     {
@@ -329,8 +334,8 @@
       "gridPos": { "x": 8, "y": 57, "w": 8, "h": 8 },
       "datasource": { "uid": "celestiaops-timescaledb" },
       "targets": [{ "rawSql": "SELECT pl_eqt AS \"Eq. Temperature (K)\" FROM exoplanets WHERE pl_eqt IS NOT NULL AND pl_eqt BETWEEN 100 AND 4500", "format": "table", "refId": "A" }],
-      "options": { "bucketSize": "auto", "fillOpacity": 70, "gradientMode": "opacity" },
-      "fieldConfig": { "defaults": { "color": { "fixedColor": "orange", "mode": "fixed" }, "custom": { "fillOpacity": 70 } } }
+      "options": { "bucketSize": "auto", "fillOpacity": 70 },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "orange", "mode": "fixed" } } }
     },
 
     {
@@ -341,8 +346,8 @@
       "gridPos": { "x": 16, "y": 57, "w": 8, "h": 8 },
       "datasource": { "uid": "celestiaops-timescaledb" },
       "targets": [{ "rawSql": "SELECT sy_dist AS \"Distance (parsecs)\" FROM exoplanets WHERE sy_dist IS NOT NULL AND sy_dist < 3000", "format": "table", "refId": "A" }],
-      "options": { "bucketSize": "auto", "fillOpacity": 70, "gradientMode": "opacity" },
-      "fieldConfig": { "defaults": { "color": { "fixedColor": "purple", "mode": "fixed" }, "custom": { "fillOpacity": 70 } } }
+      "options": { "bucketSize": "auto", "fillOpacity": 70 },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "purple", "mode": "fixed" } } }
     },
 
     {

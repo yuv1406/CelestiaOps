@@ -1,7 +1,7 @@
 {
   "title": "CelestiaOps — Exoplanet Observatory",
   "uid": "celestiaops-observatory",
-  "version": 7,
+  "version": 8,
   "schemaVersion": 38,
   "refresh": false,
   "tags": [
@@ -906,17 +906,18 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT COUNT(*) FILTER (WHERE pl_eqt < 180) AS \"<180K (Frozen)\", COUNT(*) FILTER (WHERE pl_eqt >= 180 AND pl_eqt < 310) AS \"180-310K (HZ)\", COUNT(*) FILTER (WHERE pl_eqt >= 310 AND pl_eqt < 500) AS \"310-500K (Hot)\", COUNT(*) FILTER (WHERE pl_eqt >= 500 AND pl_eqt < 1000) AS \"500-1000K (Very Hot)\", COUNT(*) FILTER (WHERE pl_eqt >= 1000 AND pl_eqt < 2000) AS \"1000-2000K (Lava)\", COUNT(*) FILTER (WHERE pl_eqt >= 2000) AS \">2000K (Ultra-Hot)\" FROM exoplanets WHERE pl_eqt IS NOT NULL",
+          "rawSql": "SELECT 'a <180K (Frozen)' AS \"Temp Range\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE pl_eqt < 180 UNION ALL SELECT 'b 180-310K (HZ)', COUNT(*) FROM exoplanets WHERE pl_eqt >= 180 AND pl_eqt < 310 UNION ALL SELECT 'c 310-500K (Hot)', COUNT(*) FROM exoplanets WHERE pl_eqt >= 310 AND pl_eqt < 500 UNION ALL SELECT 'd 500-1000K (Very Hot)', COUNT(*) FROM exoplanets WHERE pl_eqt >= 500 AND pl_eqt < 1000 UNION ALL SELECT 'e 1000-2000K (Lava)', COUNT(*) FROM exoplanets WHERE pl_eqt >= 1000 AND pl_eqt < 2000 UNION ALL SELECT 'f >2000K (Ultra-Hot)', COUNT(*) FROM exoplanets WHERE pl_eqt >= 2000",
           "format": "table",
           "refId": "A"
         }
       ],
       "options": {
+        "xField": "Temp Range",
+        "colorByField": "Temp Range",
         "barWidthFactor": 0.8,
         "tooltip": {
           "mode": "single"
         },
-        "xField": "field",
         "legend": {
           "displayMode": "hidden"
         }
@@ -932,7 +933,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "<180K (Frozen)"
+              "options": "a <180K (Frozen)"
             },
             "properties": [
               {
@@ -947,7 +948,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "180-310K (HZ)"
+              "options": "b 180-310K (HZ)"
             },
             "properties": [
               {
@@ -962,7 +963,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "310-500K (Hot)"
+              "options": "c 310-500K (Hot)"
             },
             "properties": [
               {
@@ -977,7 +978,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "500-1000K (Very Hot)"
+              "options": "d 500-1000K (Very Hot)"
             },
             "properties": [
               {
@@ -992,7 +993,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "1000-2000K (Lava)"
+              "options": "e 1000-2000K (Lava)"
             },
             "properties": [
               {
@@ -1007,7 +1008,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": ">2000K (Ultra-Hot)"
+              "options": "f >2000K (Ultra-Hot)"
             },
             "properties": [
               {

@@ -1,223 +1,322 @@
 {
-  "title": "CelestiaOps — Exoplanet Observatory",
-  "uid": "celestiaops-observatory",
-  "version": 10,
-  "schemaVersion": 38,
-  "refresh": false,
-  "tags": [
-    "celestiaops",
-    "astronomy"
-  ],
-  "time": {
-    "from": "now-5y",
-    "to": "now"
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
   },
-  "timepicker": {},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 999246040358912,
+  "liveNow": false,
   "panels": [
     {
-      "id": 1,
-      "type": "text",
-      "title": "",
       "gridPos": {
-        "x": 0,
-        "y": 0,
+        "h": 3,
         "w": 24,
-        "h": 3
+        "x": 0,
+        "y": 0
       },
+      "id": 1,
       "options": {
-        "mode": "markdown",
-        "content": "CelestiaOps Exoplanet Observatory\nReal-time catalog of **confirmed exoplanets** sourced from the NASA Exoplanet Archive (TAP). Data ingested daily at 02:00 UTC. Earth baseline: radius = 1 R⊕, mass = 1 M⊕, orbital period = 365.25 days, equilibrium temperature ≈ 255 K (effective) / 288 K (surface). Habitable zone defined as equilibrium temperature 180 – 310 K."
-      }
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "CelestiaOps Exoplanet Observatory\nReal-time catalog of **confirmed exoplanets** sourced from the NASA Exoplanet Archive (TAP). Data ingested daily at 02:00 UTC. Earth baseline: radius = 1 R\u2295, mass = 1 M\u2295, orbital period = 365.25 days, equilibrium temperature \u2248 255 K (effective) / 288 K (surface). Habitable zone defined as equilibrium temperature 180 \u2013 310 K.",
+        "mode": "markdown"
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [],
+      "title": "",
+      "type": "text"
     },
     {
-      "id": 2,
-      "type": "stat",
-      "title": "Total Confirmed Exoplanets",
-      "gridPos": {
-        "x": 0,
-        "y": 3,
-        "w": 4,
-        "h": 4
-      },
       "datasource": {
+        "type": "postgres",
         "uid": "celestiaops-timescaledb"
       },
-      "targets": [
-        {
-          "rawSql": "SELECT COUNT(*) AS value FROM exoplanets",
-          "format": "table",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
-        }
-      },
+      "description": "Total number of confirmed exoplanets in the NASA archive. Ingested daily. The count crossed 5,000 in 2022 \u2014 a milestone that took 27 years from the first confirmed detection in 1992.",
       "fieldConfig": {
         "defaults": {
           "color": {
             "fixedColor": "blue",
             "mode": "fixed"
           },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
           "unit": "short"
         }
       },
-      "description": "Total number of confirmed exoplanets in the NASA archive. Ingested daily. The count crossed 5,000 in 2022 — a milestone that took 27 years from the first confirmed detection in 1992."
-    },
-    {
-      "id": 3,
-      "type": "stat",
-      "title": "Habitable Zone Candidates",
       "gridPos": {
-        "x": 4,
-        "y": 3,
+        "h": 4,
         "w": 4,
-        "h": 4
+        "x": 0,
+        "y": 3
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
-      },
-      "targets": [
-        {
-          "rawSql": "SELECT COUNT(*) AS value FROM exoplanets WHERE is_potentially_habitable = true",
-          "format": "table",
-          "refId": "A"
-        }
-      ],
+      "id": 2,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
-          ]
-        }
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS value FROM exoplanets",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Confirmed Exoplanets",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Planets whose equilibrium temperature falls in the conservative habitable zone (180\u2013310 K). Equilibrium temperature is a theoretical surface temperature assuming Earth-like albedo. It is a necessary but not sufficient condition for liquid water.",
       "fieldConfig": {
         "defaults": {
           "color": {
             "fixedColor": "green",
             "mode": "fixed"
           },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
           "unit": "short"
         }
       },
-      "description": "Planets whose equilibrium temperature falls in the conservative habitable zone (180–310 K). Equilibrium temperature is a theoretical surface temperature assuming Earth-like albedo. It is a necessary but not sufficient condition for liquid water."
-    },
-    {
-      "id": 4,
-      "type": "stat",
-      "title": "Sun-like Host Stars (G-type)",
       "gridPos": {
-        "x": 8,
-        "y": 3,
+        "h": 4,
         "w": 4,
-        "h": 4
+        "x": 4,
+        "y": 3
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
-      },
-      "targets": [
-        {
-          "rawSql": "SELECT COUNT(DISTINCT hostname) AS value FROM exoplanets WHERE st_teff BETWEEN 5200 AND 6000",
-          "format": "table",
-          "refId": "A"
-        }
-      ],
+      "id": 3,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
-          ]
-        }
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS value FROM exoplanets WHERE is_potentially_habitable = true",
+          "refId": "A"
+        }
+      ],
+      "title": "Habitable Zone Candidates",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Host stars with effective temperature between 5,200 K and 6,000 K \u2014 the G spectral class, the same as our Sun (5,778 K). G-type stars are relatively stable and long-lived, making them attractive targets in the search for habitable planets.",
       "fieldConfig": {
         "defaults": {
           "color": {
             "fixedColor": "yellow",
             "mode": "fixed"
           },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
           "unit": "short"
         }
       },
-      "description": "Host stars with effective temperature between 5,200 K and 6,000 K — the G spectral class, the same as our Sun (5,778 K). G-type stars are relatively stable and long-lived, making them attractive targets in the search for habitable planets."
-    },
-    {
-      "id": 5,
-      "type": "stat",
-      "title": "Multi-Planet Systems",
       "gridPos": {
-        "x": 12,
-        "y": 3,
+        "h": 4,
         "w": 4,
-        "h": 4
+        "x": 8,
+        "y": 3
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
-      },
-      "targets": [
-        {
-          "rawSql": "SELECT COUNT(DISTINCT hostname) AS value FROM exoplanets WHERE sy_pnum >= 2",
-          "format": "table",
-          "refId": "A"
-        }
-      ],
+      "id": 4,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
-          ]
-        }
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(DISTINCT hostname) AS value FROM exoplanets WHERE st_teff BETWEEN 5200 AND 6000",
+          "refId": "A"
+        }
+      ],
+      "title": "Sun-like Host Stars (G-type)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Star systems with two or more confirmed planets. Multi-planet systems are important because they suggest dynamically stable architectures and provide comparative context \u2014 planets in the same system formed from the same protoplanetary disk.",
       "fieldConfig": {
         "defaults": {
           "color": {
             "fixedColor": "purple",
             "mode": "fixed"
           },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
           "unit": "short"
         }
       },
-      "description": "Star systems with two or more confirmed planets. Multi-planet systems are important because they suggest dynamically stable architectures and provide comparative context — planets in the same system formed from the same protoplanetary disk."
-    },
-    {
-      "id": 6,
-      "type": "stat",
-      "title": "Nearest Exoplanet (ly)",
       "gridPos": {
-        "x": 16,
-        "y": 3,
+        "h": 4,
         "w": 4,
-        "h": 4
+        "x": 12,
+        "y": 3
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
-      },
-      "targets": [
-        {
-          "rawSql": "SELECT ROUND((MIN(sy_dist) * 3.26156)::numeric, 2) AS value FROM exoplanets WHERE sy_dist IS NOT NULL",
-          "format": "table",
-          "refId": "A"
-        }
-      ],
+      "id": 5,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
-          ]
-        }
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(DISTINCT hostname) AS value FROM exoplanets WHERE sy_pnum >= 2",
+          "refId": "A"
+        }
+      ],
+      "title": "Multi-Planet Systems",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Distance in light-years to the closest confirmed exoplanet. Currently Proxima Centauri d at 4.24 ly. For scale: the New Horizons spacecraft, the fastest object humans have launched, would take approximately 78,000 years to reach it.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -225,218 +324,432 @@
             "mode": "fixed"
           },
           "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
           "unit": "none"
         }
       },
-      "description": "Distance in light-years to the closest confirmed exoplanet. Currently Proxima Centauri d at 4.24 ly. For scale: the New Horizons spacecraft, the fastest object humans have launched, would take approximately 78,000 years to reach it."
-    },
-    {
-      "id": 7,
-      "type": "stat",
-      "title": "Last Ingest",
       "gridPos": {
-        "x": 20,
-        "y": 3,
+        "h": 4,
         "w": 4,
-        "h": 4
+        "x": 16,
+        "y": 3
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
-      },
-      "targets": [
-        {
-          "rawSql": "SELECT TO_CHAR(last_sync_at AT TIME ZONE 'UTC', 'YYYY-MM-DD HH24:MI') AS value FROM sync_state WHERE dag_id = 'ingest_exoplanets'",
-          "format": "table",
-          "refId": "A"
-        }
-      ],
+      "id": 6,
       "options": {
-        "colorMode": "none",
+        "colorMode": "background",
         "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
-          ]
-        }
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT ROUND((MIN(sy_dist) * 3.26156)::numeric, 2) AS value FROM exoplanets WHERE sy_dist IS NOT NULL",
+          "refId": "A"
+        }
+      ],
+      "title": "Nearest Exoplanet (ly)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Timestamp of the last successful NASA TAP ingest run. The pipeline runs daily at 02:00 UTC. If this timestamp is more than 36 hours old the snapshot DAG will refuse to run until the data is refreshed.",
       "fieldConfig": {
-        "defaults": {}
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        }
       },
-      "description": "Timestamp of the last successful NASA TAP ingest run. The pipeline runs daily at 02:00 UTC. If this timestamp is more than 36 hours old the snapshot DAG will refuse to run until the data is refreshed."
-    },
-    {
-      "id": 8,
-      "type": "piechart",
-      "title": "Planet Classification by Radius",
-      "description": "Rocky < 1.5 R⊕ | Super-Earth 1.5–2.5 | Sub-Neptune 2.5–4 | Neptune-like 4–10 | Gas Giant > 10",
       "gridPos": {
-        "x": 0,
-        "y": 7,
-        "w": 8,
-        "h": 9
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 3
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
+      "id": 7,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "13.0.1+security-01",
       "targets": [
         {
-          "rawSql": "SELECT COUNT(*) FILTER (WHERE pl_rade < 1.5) AS \"Rocky (<1.5 R⊕)\", COUNT(*) FILTER (WHERE pl_rade >= 1.5 AND pl_rade < 2.5) AS \"Super-Earth (1.5-2.5)\", COUNT(*) FILTER (WHERE pl_rade >= 2.5 AND pl_rade < 4.0) AS \"Sub-Neptune (2.5-4)\", COUNT(*) FILTER (WHERE pl_rade >= 4.0 AND pl_rade < 10.0) AS \"Neptune-like (4-10)\", COUNT(*) FILTER (WHERE pl_rade >= 10.0) AS \"Gas Giant (>10)\" FROM exoplanets WHERE pl_rade IS NOT NULL",
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
           "format": "table",
+          "rawSql": "SELECT TO_CHAR(last_sync_at AT TIME ZONE 'UTC', 'YYYY-MM-DD HH24:MI') AS value FROM sync_state WHERE dag_id = 'ingest_exoplanets'",
           "refId": "A"
         }
       ],
-      "options": {
-        "pieType": "donut",
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "values": [
-            "value",
-            "percent"
-          ]
-        }
-      }
+      "title": "Last Ingest",
+      "type": "stat"
     },
     {
-      "id": 9,
-      "type": "piechart",
-      "title": "Host Star Spectral Classification",
-      "description": "M < 3700K (red dwarf) | K 3700–5200K | G 5200–6000K (Sun-like) | F 6000–7500K | A+ > 7500K",
-      "gridPos": {
-        "x": 8,
-        "y": 7,
-        "w": 8,
-        "h": 9
-      },
       "datasource": {
+        "type": "postgres",
         "uid": "celestiaops-timescaledb"
       },
-      "targets": [
-        {
-          "rawSql": "SELECT COUNT(*) FILTER (WHERE st_teff < 3700) AS \"M — Red Dwarf (<3700 K)\", COUNT(*) FILTER (WHERE st_teff >= 3700 AND st_teff < 5200) AS \"K — Orange (3700-5200 K)\", COUNT(*) FILTER (WHERE st_teff >= 5200 AND st_teff < 6000) AS \"G — Sun-like (5200-6000 K)\", COUNT(*) FILTER (WHERE st_teff >= 6000 AND st_teff < 7500) AS \"F — Yellow-White (6000-7500 K)\", COUNT(*) FILTER (WHERE st_teff >= 7500) AS \"A+ — Hot (>7500 K)\" FROM exoplanets WHERE st_teff IS NOT NULL",
-          "format": "table",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "pieType": "donut",
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "values": [
-            "value",
-            "percent"
-          ]
-        }
-      }
-    },
-    {
-      "id": 10,
-      "type": "piechart",
-      "title": "Discovery Methods",
-      "gridPos": {
-        "x": 16,
-        "y": 7,
-        "w": 8,
-        "h": 9
-      },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
-      },
-      "targets": [
-        {
-          "rawSql": "SELECT COUNT(*) FILTER (WHERE discoverymethod = 'Transit') AS \"Transit\", COUNT(*) FILTER (WHERE discoverymethod = 'Radial Velocity') AS \"Radial Velocity\", COUNT(*) FILTER (WHERE discoverymethod = 'Microlensing') AS \"Microlensing\", COUNT(*) FILTER (WHERE discoverymethod = 'Imaging') AS \"Imaging\", COUNT(*) FILTER (WHERE discoverymethod = 'Transit Timing Variations') AS \"Transit Timing Variations\", COUNT(*) FILTER (WHERE discoverymethod NOT IN ('Transit','Radial Velocity','Microlensing','Imaging','Transit Timing Variations')) AS \"Other\" FROM exoplanets WHERE discoverymethod IS NOT NULL",
-          "format": "table",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "pieType": "donut",
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "values": [
-            "value",
-            "percent"
-          ]
-        }
-      },
-      "description": "How each planet was detected. Transit (74%) dominates because Kepler and TESS observed hundreds of thousands of stars simultaneously. Radial Velocity was the primary method before space telescopes. Microlensing and Imaging are rarer but can detect planets that transits cannot."
-    },
-    {
-      "id": 11,
-      "type": "barchart",
-      "title": "Annual Discoveries",
-      "gridPos": {
-        "x": 0,
-        "y": 16,
-        "w": 12,
-        "h": 8
-      },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
-      },
-      "targets": [
-        {
-          "rawSql": "SELECT disc_year::text AS \"Year\", COUNT(*) AS \"New Planets Confirmed\" FROM exoplanets WHERE disc_year IS NOT NULL GROUP BY disc_year ORDER BY disc_year",
-          "format": "table",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "xField": "Year",
-        "barWidthFactor": 0.9,
-        "tooltip": {
-          "mode": "single"
-        }
-      },
+      "description": "Rocky < 1.5 R\u2295 | Super-Earth 1.5\u20132.5 | Sub-Neptune 2.5\u20134 | Neptune-like 4\u201310 | Gas Giant > 10",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
           }
         }
       },
-      "description": "Confirmed discoveries per year. The spike around 2014–2016 is Kepler's statistical validation wave — hundreds of candidates confirmed simultaneously using probability-based methods. Post-2020 growth is predominantly from TESS."
-    },
-    {
-      "id": 12,
-      "type": "timeseries",
-      "title": "Cumulative Exoplanet Count Over Time",
       "gridPos": {
-        "x": 12,
-        "y": 16,
-        "w": 12,
-        "h": 8
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 7
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
+      "id": 8,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
       },
+      "pluginVersion": "13.0.1+security-01",
       "targets": [
         {
-          "rawSql": "SELECT make_date(disc_year::int, 6, 1) AS \"time\", SUM(COUNT(*)) OVER (ORDER BY disc_year) AS \"Cumulative Planets\" FROM exoplanets WHERE disc_year IS NOT NULL GROUP BY disc_year ORDER BY disc_year",
-          "format": "time_series",
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) FILTER (WHERE pl_rade < 1.5) AS \"Rocky (<1.5 R\u2295)\", COUNT(*) FILTER (WHERE pl_rade >= 1.5 AND pl_rade < 2.5) AS \"Super-Earth (1.5-2.5)\", COUNT(*) FILTER (WHERE pl_rade >= 2.5 AND pl_rade < 4.0) AS \"Sub-Neptune (2.5-4)\", COUNT(*) FILTER (WHERE pl_rade >= 4.0 AND pl_rade < 10.0) AS \"Neptune-like (4-10)\", COUNT(*) FILTER (WHERE pl_rade >= 10.0) AS \"Gas Giant (>10)\" FROM exoplanets WHERE pl_rade IS NOT NULL",
           "refId": "A"
         }
       ],
-      "options": {
-        "tooltip": {
-          "mode": "single"
-        },
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
+      "title": "Planet Classification by Radius",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "M < 3700K (red dwarf) | K 3700\u20135200K | G 5200\u20136000K (Sun-like) | F 6000\u20137500K | A+ > 7500K",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
         }
       },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 8,
+        "y": 7
+      },
+      "id": 9,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) FILTER (WHERE st_teff < 3700) AS \"M \u2014 Red Dwarf (<3700 K)\", COUNT(*) FILTER (WHERE st_teff >= 3700 AND st_teff < 5200) AS \"K \u2014 Orange (3700-5200 K)\", COUNT(*) FILTER (WHERE st_teff >= 5200 AND st_teff < 6000) AS \"G \u2014 Sun-like (5200-6000 K)\", COUNT(*) FILTER (WHERE st_teff >= 6000 AND st_teff < 7500) AS \"F \u2014 Yellow-White (6000-7500 K)\", COUNT(*) FILTER (WHERE st_teff >= 7500) AS \"A+ \u2014 Hot (>7500 K)\" FROM exoplanets WHERE st_teff IS NOT NULL",
+          "refId": "A"
+        }
+      ],
+      "title": "Host Star Spectral Classification",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "How each planet was detected. Transit (74%) dominates because Kepler and TESS observed hundreds of thousands of stars simultaneously. Radial Velocity was the primary method before space telescopes. Microlensing and Imaging are rarer but can detect planets that transits cannot.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        }
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 7
+      },
+      "id": 10,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) FILTER (WHERE discoverymethod = 'Transit') AS \"Transit\", COUNT(*) FILTER (WHERE discoverymethod = 'Radial Velocity') AS \"Radial Velocity\", COUNT(*) FILTER (WHERE discoverymethod = 'Microlensing') AS \"Microlensing\", COUNT(*) FILTER (WHERE discoverymethod = 'Imaging') AS \"Imaging\", COUNT(*) FILTER (WHERE discoverymethod = 'Transit Timing Variations') AS \"Transit Timing Variations\", COUNT(*) FILTER (WHERE discoverymethod NOT IN ('Transit','Radial Velocity','Microlensing','Imaging','Transit Timing Variations')) AS \"Other\" FROM exoplanets WHERE discoverymethod IS NOT NULL",
+          "refId": "A"
+        }
+      ],
+      "title": "Discovery Methods",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Confirmed discoveries per year. The spike around 2014\u20132016 is Kepler's statistical validation wave \u2014 hundreds of candidates confirmed simultaneously using probability-based methods. Post-2020 growth is predominantly from TESS.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 11,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "barWidthFactor": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Year",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT disc_year::text AS \"Year\", COUNT(*) AS \"New Planets Confirmed\" FROM exoplanets WHERE disc_year IS NOT NULL GROUP BY disc_year ORDER BY disc_year",
+          "refId": "A"
+        }
+      ],
+      "title": "Annual Discoveries",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Running total of confirmed planets over time. The curve is accelerating \u2014 the first 1,000 confirmations took 17 years (1992\u20132009); the most recent 1,000 took under two years. Space-based transit surveys fundamentally changed the rate of discovery.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -444,45 +757,124 @@
             "mode": "fixed"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
             "lineWidth": 2,
-            "fillOpacity": 15
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
         }
       },
-      "description": "Running total of confirmed planets over time. The curve is accelerating — the first 1,000 confirmations took 17 years (1992–2009); the most recent 1,000 took under two years. Space-based transit surveys fundamentally changed the rate of discovery."
-    },
-    {
-      "id": 13,
-      "type": "table",
-      "title": "Planet Catalog — All Confirmed Exoplanets",
       "gridPos": {
-        "x": 0,
-        "y": 24,
-        "w": 24,
-        "h": 13
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
+      "id": 12,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
       },
+      "pluginVersion": "13.0.1+security-01",
       "targets": [
         {
-          "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Host Star\", disc_year AS \"Year\", discoverymethod AS \"Method\", ROUND(pl_rade::numeric, 2) AS \"Radius (R⊕)\", ROUND(pl_masse::numeric, 2) AS \"Mass (M⊕)\", ROUND(pl_orbper::numeric, 2) AS \"Period (days)\", ROUND(pl_eqt::numeric, 0) AS \"Eq. Temp (K)\", ROUND(sy_dist::numeric, 1) AS \"Dist (pc)\", ROUND((sy_dist * 3.26156)::numeric, 1) AS \"Dist (ly)\", sy_pnum AS \"# Planets in System\", CASE WHEN is_potentially_habitable THEN 'HZ' ELSE '' END AS \"HZ\" FROM exoplanets ORDER BY disc_year DESC, pl_name LIMIT 2000",
-          "format": "table",
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "time_series",
+          "rawSql": "SELECT make_date(disc_year::int, 6, 1) AS \"time\", SUM(COUNT(*)) OVER (ORDER BY disc_year) AS \"Cumulative Planets\" FROM exoplanets WHERE disc_year IS NOT NULL GROUP BY disc_year ORDER BY disc_year",
           "refId": "A"
         }
       ],
-      "options": {
-        "sortBy": [
-          {
-            "displayName": "Year",
-            "desc": true
-          }
-        ]
+      "title": "Cumulative Exoplanet Count Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
       },
+      "description": "Full searchable catalog. All columns are sortable. The HZ column (green badge) marks habitable zone candidates. The Eq. Temp column is color-coded: blue = frozen, green = habitable zone, orange = hot, red = extreme. Dist (ly) = distance in light-years (1 parsec = 3.26 ly). R\u2295 and M\u2295 are Earth-relative units.",
       "fieldConfig": {
         "defaults": {
           "custom": {
-            "filterable": true
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
         },
         "overrides": [
@@ -497,20 +889,16 @@
                 "value": 50
               },
               {
-                "id": "custom.displayMode",
-                "value": "color-background"
-              },
-              {
                 "id": "mappings",
                 "value": [
                   {
-                    "type": "value",
                     "options": {
                       "HZ": {
                         "color": "green",
                         "index": 0
                       }
-                    }
+                    },
+                    "type": "value"
                   }
                 ]
               }
@@ -529,7 +917,7 @@
                   "steps": [
                     {
                       "color": "blue",
-                      "value": null
+                      "value": 0
                     },
                     {
                       "color": "green",
@@ -545,17 +933,13 @@
                     }
                   ]
                 }
-              },
-              {
-                "id": "custom.displayMode",
-                "value": "color-background"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Radius (R⊕)"
+              "options": "Radius (R\u2295)"
             },
             "properties": [
               {
@@ -567,7 +951,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Mass (M⊕)"
+              "options": "Mass (M\u2295)"
             },
             "properties": [
               {
@@ -578,41 +962,76 @@
           }
         ]
       },
-      "description": "Full searchable catalog. All columns are sortable. The HZ column (green badge) marks habitable zone candidates. The Eq. Temp column is color-coded: blue = frozen, green = habitable zone, orange = hot, red = extreme. Dist (ly) = distance in light-years (1 parsec = 3.26 ly). R⊕ and M⊕ are Earth-relative units."
-    },
-    {
-      "id": 14,
-      "type": "table",
-      "title": "🌱 Habitable Zone Candidates — Ordered by Earth Temperature Similarity",
-      "description": "Planets with equilibrium temperature 180–310 K, closest to Earth's ~288 K surface average",
       "gridPos": {
+        "h": 13,
+        "w": 24,
         "x": 0,
-        "y": 37,
-        "w": 12,
-        "h": 10
+        "y": 24
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
+      "id": 13,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Year"
+          }
+        ]
       },
+      "pluginVersion": "13.0.1+security-01",
       "targets": [
         {
-          "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_rade::numeric, 2) AS \"Radius (R⊕)\", ROUND(pl_masse::numeric, 2) AS \"Mass (M⊕)\", ROUND(pl_eqt::numeric, 0) AS \"Eq. Temp (K)\", ROUND((pl_eqt - 288)::numeric, 0) AS \"ΔT vs Earth (K)\", ROUND(sy_dist::numeric, 1) AS \"Dist (pc)\", ROUND((sy_dist * 3.26156)::numeric, 1) AS \"Dist (ly)\", disc_year AS \"Year\", discoverymethod AS \"Method\" FROM exoplanets WHERE is_potentially_habitable = true ORDER BY ABS(COALESCE(pl_eqt, 9999) - 288), pl_name",
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
           "format": "table",
+          "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Host Star\", disc_year AS \"Year\", discoverymethod AS \"Method\", ROUND(pl_rade::numeric, 2) AS \"Radius (R\u2295)\", ROUND(pl_masse::numeric, 2) AS \"Mass (M\u2295)\", ROUND(pl_orbper::numeric, 2) AS \"Period (days)\", ROUND(pl_eqt::numeric, 0) AS \"Eq. Temp (K)\", ROUND(sy_dist::numeric, 1) AS \"Dist (pc)\", ROUND((sy_dist * 3.26156)::numeric, 1) AS \"Dist (ly)\", sy_pnum AS \"# Planets in System\", CASE WHEN is_potentially_habitable THEN 'HZ' ELSE '' END AS \"HZ\" FROM exoplanets ORDER BY disc_year DESC, pl_name LIMIT 2000",
           "refId": "A"
         }
       ],
-      "options": {},
+      "title": "Planet Catalog \u2014 All Confirmed Exoplanets",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Planets with equilibrium temperature 180\u2013310 K, closest to Earth's ~288 K surface average",
       "fieldConfig": {
         "defaults": {
           "custom": {
-            "filterable": true
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
         },
         "overrides": [
           {
             "matcher": {
               "id": "byName",
-              "options": "ΔT vs Earth (K)"
+              "options": "\u0394T vs Earth (K)"
             },
             "properties": [
               {
@@ -622,7 +1041,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     },
                     {
                       "color": "yellow",
@@ -634,41 +1053,68 @@
                     }
                   ]
                 }
-              },
-              {
-                "id": "custom.displayMode",
-                "value": "color-background"
               }
             ]
           }
         ]
-      }
-    },
-    {
-      "id": 15,
-      "type": "table",
-      "title": "Nearest Exoplanets to Earth",
+      },
       "gridPos": {
-        "x": 12,
-        "y": 37,
+        "h": 10,
         "w": 12,
-        "h": 10
+        "x": 0,
+        "y": 37
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
+      "id": 14,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
       },
+      "pluginVersion": "13.0.1+security-01",
       "targets": [
         {
-          "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND((sy_dist * 3.26156)::numeric, 3) AS \"Distance (ly)\", ROUND(sy_dist::numeric, 3) AS \"Distance (pc)\", ROUND(pl_rade::numeric, 2) AS \"Radius (R⊕)\", ROUND(pl_masse::numeric, 2) AS \"Mass (M⊕)\", ROUND(pl_eqt::numeric, 0) AS \"Eq. Temp (K)\", disc_year AS \"Year\", CASE WHEN is_potentially_habitable THEN 'HZ' ELSE '' END AS \"HZ\" FROM exoplanets WHERE sy_dist IS NOT NULL ORDER BY sy_dist ASC LIMIT 30",
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
           "format": "table",
+          "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_rade::numeric, 2) AS \"Radius (R\u2295)\", ROUND(pl_masse::numeric, 2) AS \"Mass (M\u2295)\", ROUND(pl_eqt::numeric, 0) AS \"Eq. Temp (K)\", ROUND((pl_eqt - 288)::numeric, 0) AS \"\u0394T vs Earth (K)\", ROUND(sy_dist::numeric, 1) AS \"Dist (pc)\", ROUND((sy_dist * 3.26156)::numeric, 1) AS \"Dist (ly)\", disc_year AS \"Year\", discoverymethod AS \"Method\" FROM exoplanets WHERE is_potentially_habitable = true ORDER BY ABS(COALESCE(pl_eqt, 9999) - 288), pl_name",
           "refId": "A"
         }
       ],
-      "options": {},
+      "title": "\ud83c\udf31 Habitable Zone Candidates \u2014 Ordered by Earth Temperature Similarity",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "The 30 nearest confirmed exoplanets by distance. Distance color: green = within 50 ly, yellow = 50\u2013200 ly, orange = 200\u20131000 ly, red = beyond. HZ badge indicates habitable zone candidates. Proxima Cen b and d are the closest at 4.24 ly.",
       "fieldConfig": {
         "defaults": {
           "custom": {
-            "filterable": true
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
         },
         "overrides": [
@@ -683,20 +1129,16 @@
                 "value": 50
               },
               {
-                "id": "custom.displayMode",
-                "value": "color-background"
-              },
-              {
                 "id": "mappings",
                 "value": [
                   {
-                    "type": "value",
                     "options": {
                       "HZ": {
                         "color": "green",
                         "index": 0
                       }
-                    }
+                    },
+                    "type": "value"
                   }
                 ]
               }
@@ -715,7 +1157,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     },
                     {
                       "color": "yellow",
@@ -731,85 +1173,161 @@
                     }
                   ]
                 }
-              },
-              {
-                "id": "custom.displayMode",
-                "value": "color-background"
               }
             ]
           }
         ]
       },
-      "description": "The 30 nearest confirmed exoplanets by distance. Distance color: green = within 50 ly, yellow = 50–200 ly, orange = 200–1000 ly, red = beyond. HZ badge indicates habitable zone candidates. Proxima Cen b and d are the closest at 4.24 ly."
-    },
-    {
-      "id": 16,
-      "type": "barchart",
-      "title": "Planet Count by Size Class (Radius Bins)",
-      "description": "Rocky < 1.5 R⊕ | Super-Earth 1.5–2.5 | Sub-Neptune 2.5–4 | Neptune-like 4–10 | Gas Giant > 10. Earth = 1 R⊕, Neptune = 3.9 R⊕, Jupiter = 11.2 R⊕",
       "gridPos": {
-        "x": 0,
-        "y": 47,
-        "w": 14,
-        "h": 10
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 37
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
+      "id": 15,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
       },
+      "pluginVersion": "13.0.1+security-01",
       "targets": [
         {
-          "rawSql": "SELECT CASE WHEN pl_rade < 1.5 THEN '1. Rocky\\n<1.5 R⊕' WHEN pl_rade < 2.5 THEN '2. Super-Earth\\n1.5–2.5 R⊕' WHEN pl_rade < 4.0 THEN '3. Sub-Neptune\\n2.5–4 R⊕' WHEN pl_rade < 10.0 THEN '4. Neptune-like\\n4–10 R⊕' ELSE '5. Gas Giant\\n>10 R⊕' END AS \"Class\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE pl_rade IS NOT NULL GROUP BY 1 ORDER BY 1",
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
           "format": "table",
+          "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND((sy_dist * 3.26156)::numeric, 3) AS \"Distance (ly)\", ROUND(sy_dist::numeric, 3) AS \"Distance (pc)\", ROUND(pl_rade::numeric, 2) AS \"Radius (R\u2295)\", ROUND(pl_masse::numeric, 2) AS \"Mass (M\u2295)\", ROUND(pl_eqt::numeric, 0) AS \"Eq. Temp (K)\", disc_year AS \"Year\", CASE WHEN is_potentially_habitable THEN 'HZ' ELSE '' END AS \"HZ\" FROM exoplanets WHERE sy_dist IS NOT NULL ORDER BY sy_dist ASC LIMIT 30",
           "refId": "A"
         }
       ],
-      "options": {
-        "xField": "Class",
-        "barWidthFactor": 0.8,
-        "tooltip": {
-          "mode": "single"
-        }
+      "title": "Nearest Exoplanets to Earth",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
       },
+      "description": "Rocky < 1.5 R\u2295 | Super-Earth 1.5\u20132.5 | Sub-Neptune 2.5\u20134 | Neptune-like 4\u201310 | Gas Giant > 10. Earth = 1 R\u2295, Neptune = 3.9 R\u2295, Jupiter = 11.2 R\u2295",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
         }
-      }
-    },
-    {
-      "id": 17,
-      "type": "table",
-      "title": "🌌 Most Prolific Multi-Planet Systems",
+      },
       "gridPos": {
-        "x": 14,
-        "y": 47,
-        "w": 10,
-        "h": 10
+        "h": 10,
+        "w": 14,
+        "x": 0,
+        "y": 47
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
+      "id": 16,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "barWidthFactor": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Class",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
       },
+      "pluginVersion": "13.0.1+security-01",
       "targets": [
         {
-          "rawSql": "SELECT hostname AS \"Star System\", MAX(sy_pnum) AS \"Planets\", COUNT(*) AS \"Confirmed\", MIN(disc_year) AS \"First Disc.\", ROUND(AVG(pl_orbper)::numeric, 1) AS \"Avg Period (days)\", ROUND(AVG(pl_rade)::numeric, 2) AS \"Avg Radius (R⊕)\", ROUND(MIN(sy_dist * 3.26156)::numeric, 1) AS \"Dist (ly)\" FROM exoplanets WHERE sy_pnum >= 3 GROUP BY hostname, sy_pnum ORDER BY sy_pnum DESC, hostname LIMIT 30",
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
           "format": "table",
+          "rawSql": "SELECT CASE WHEN pl_rade < 1.5 THEN '1. Rocky\\n<1.5 R\u2295' WHEN pl_rade < 2.5 THEN '2. Super-Earth\\n1.5\u20132.5 R\u2295' WHEN pl_rade < 4.0 THEN '3. Sub-Neptune\\n2.5\u20134 R\u2295' WHEN pl_rade < 10.0 THEN '4. Neptune-like\\n4\u201310 R\u2295' ELSE '5. Gas Giant\\n>10 R\u2295' END AS \"Class\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE pl_rade IS NOT NULL GROUP BY 1 ORDER BY 1",
           "refId": "A"
         }
       ],
-      "options": {
-        "sortBy": [
-          {
-            "displayName": "Planets",
-            "desc": true
-          }
-        ]
+      "title": "Planet Count by Size Class (Radius Bins)",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
       },
+      "description": "Star systems with 3 or more confirmed planets, ranked by planet count. KOI-351 (Kepler-90) has 8 confirmed planets \u2014 the only known system matching our Solar System. TRAPPIST-1 has 7, all rocky and several in the habitable zone. Planets column is color-coded: blue = 3, green = 4+, yellow = 6+, orange = 8+.",
       "fieldConfig": {
         "defaults": {
           "custom": {
-            "filterable": true
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
         },
         "overrides": [
@@ -826,7 +1344,7 @@
                   "steps": [
                     {
                       "color": "blue",
-                      "value": null
+                      "value": 0
                     },
                     {
                       "color": "green",
@@ -842,152 +1360,446 @@
                     }
                   ]
                 }
-              },
-              {
-                "id": "custom.displayMode",
-                "value": "color-background"
               }
             ]
           }
         ]
       },
-      "description": "Star systems with 3 or more confirmed planets, ranked by planet count. KOI-351 (Kepler-90) has 8 confirmed planets — the only known system matching our Solar System. TRAPPIST-1 has 7, all rocky and several in the habitable zone. Planets column is color-coded: blue = 3, green = 4+, yellow = 6+, orange = 8+."
-    },
-    {
-      "id": 18,
-      "type": "barchart",
-      "title": "Orbital Period Distribution (days < 1000)",
-      "description": "Earth = 365.25 days. Most close-in transiting planets have periods < 10 days.",
       "gridPos": {
-        "x": 0,
-        "y": 57,
-        "w": 8,
-        "h": 8
+        "h": 10,
+        "w": 10,
+        "x": 14,
+        "y": 47
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
+      "id": 17,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Planets"
+          }
+        ]
       },
+      "pluginVersion": "13.0.1+security-01",
       "targets": [
         {
-          "rawSql": "SELECT CASE WHEN pl_orbper < 2 THEN '0–2d (Hot)' WHEN pl_orbper < 10 THEN '2–10d' WHEN pl_orbper < 30 THEN '10–30d' WHEN pl_orbper < 100 THEN '30–100d' WHEN pl_orbper < 200 THEN '100–200d' WHEN pl_orbper < 365 THEN '200–365d' WHEN pl_orbper < 500 THEN '365–500d (Earth-like)' ELSE '500–1000d' END AS \"Period Range\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE pl_orbper BETWEEN 0.1 AND 1000 GROUP BY 1 ORDER BY MIN(pl_orbper)",
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
           "format": "table",
+          "rawSql": "SELECT hostname AS \"Star System\", MAX(sy_pnum) AS \"Planets\", COUNT(*) AS \"Confirmed\", MIN(disc_year) AS \"First Disc.\", ROUND(AVG(pl_orbper)::numeric, 1) AS \"Avg Period (days)\", ROUND(AVG(pl_rade)::numeric, 2) AS \"Avg Radius (R\u2295)\", ROUND(MIN(sy_dist * 3.26156)::numeric, 1) AS \"Dist (ly)\" FROM exoplanets WHERE sy_pnum >= 3 GROUP BY hostname, sy_pnum ORDER BY sy_pnum DESC, hostname LIMIT 30",
           "refId": "A"
         }
       ],
-      "options": {
-        "xField": "Period Range",
-        "barWidthFactor": 0.8,
-        "tooltip": {
-          "mode": "single"
-        }
+      "title": "\ud83c\udf0c Most Prolific Multi-Planet Systems",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
       },
+      "description": "Earth = 365.25 days. Most close-in transiting planets have periods < 10 days.",
       "fieldConfig": {
         "defaults": {
           "color": {
             "fixedColor": "blue",
             "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
         }
-      }
-    },
-    {
-      "id": 19,
-      "type": "barchart",
-      "title": "Equilibrium Temperature Distribution",
-      "description": "Planet count by equilibrium temperature bucket. The 180–310 K range is the conservative habitable zone (HZ) — where liquid water could exist on the surface. Earth's effective temperature is ~255 K. Note: all bars share the same color; the x-axis labels identify each bucket.",
+      },
       "gridPos": {
-        "x": 8,
-        "y": 57,
-        "w": 8,
-        "h": 8
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 57
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
+      "id": 18,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "barWidthFactor": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Period Range",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
       },
+      "pluginVersion": "13.0.1+security-01",
       "targets": [
         {
-          "rawSql": "SELECT CASE WHEN pl_eqt < 180 THEN '<180K (Frozen)' WHEN pl_eqt < 310 THEN '180-310K (Habitable Zone)' WHEN pl_eqt < 500 THEN '310-500K (Hot)' WHEN pl_eqt < 1000 THEN '500-1000K (Very Hot)' WHEN pl_eqt < 2000 THEN '1000-2000K (Lava)' ELSE '>2000K (Ultra-Hot)' END AS \"Temp Range\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE pl_eqt IS NOT NULL GROUP BY 1 ORDER BY MIN(pl_eqt)",
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
           "format": "table",
+          "rawSql": "SELECT CASE WHEN pl_orbper < 2 THEN '0\u20132d (Hot)' WHEN pl_orbper < 10 THEN '2\u201310d' WHEN pl_orbper < 30 THEN '10\u201330d' WHEN pl_orbper < 100 THEN '30\u2013100d' WHEN pl_orbper < 200 THEN '100\u2013200d' WHEN pl_orbper < 365 THEN '200\u2013365d' WHEN pl_orbper < 500 THEN '365\u2013500d (Earth-like)' ELSE '500\u20131000d' END AS \"Period Range\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE pl_orbper BETWEEN 0.1 AND 1000 GROUP BY 1 ORDER BY MIN(pl_orbper)",
           "refId": "A"
         }
       ],
-      "options": {
-        "xField": "Temp Range",
-        "barWidthFactor": 0.8,
-        "tooltip": {
-          "mode": "single"
-        }
+      "title": "Orbital Period Distribution (days < 1000)",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
       },
+      "description": "Planet count by equilibrium temperature bucket. The 180\u2013310 K range is the conservative habitable zone (HZ) \u2014 where liquid water could exist on the surface. Earth's effective temperature is ~255 K. Note: all bars share the same color; the x-axis labels identify each bucket.",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "fixed",
-            "fixedColor": "green"
+            "fixedColor": "green",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
-        },
-        "overrides": []
-      }
-    },
-    {
-      "id": 20,
-      "type": "barchart",
-      "title": "Distance Distribution (parsecs < 3000)",
-      "description": "1 parsec = 3.26 light-years. Kepler field ≈ 300–3000 pc.",
+        }
+      },
       "gridPos": {
-        "x": 16,
-        "y": 57,
-        "w": 8,
-        "h": 8
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 57
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
+      "id": 19,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "barWidthFactor": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Temp Range",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
       },
+      "pluginVersion": "13.0.1+security-01",
       "targets": [
         {
-          "rawSql": "SELECT CASE WHEN sy_dist < 10 THEN '<10 pc (33 ly)' WHEN sy_dist < 50 THEN '10–50 pc' WHEN sy_dist < 100 THEN '50–100 pc' WHEN sy_dist < 300 THEN '100–300 pc' WHEN sy_dist < 500 THEN '300–500 pc' WHEN sy_dist < 1000 THEN '500–1000 pc' WHEN sy_dist < 2000 THEN '1000–2000 pc' ELSE '2000–3000 pc' END AS \"Distance Range\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE sy_dist IS NOT NULL AND sy_dist < 3000 GROUP BY 1 ORDER BY MIN(sy_dist)",
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
           "format": "table",
+          "rawSql": "SELECT CASE WHEN pl_eqt < 180 THEN '<180K (Frozen)' WHEN pl_eqt < 310 THEN '180-310K (Habitable Zone)' WHEN pl_eqt < 500 THEN '310-500K (Hot)' WHEN pl_eqt < 1000 THEN '500-1000K (Very Hot)' WHEN pl_eqt < 2000 THEN '1000-2000K (Lava)' ELSE '>2000K (Ultra-Hot)' END AS \"Temp Range\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE pl_eqt IS NOT NULL GROUP BY 1 ORDER BY MIN(pl_eqt)",
           "refId": "A"
         }
       ],
-      "options": {
-        "xField": "Distance Range",
-        "barWidthFactor": 0.8,
-        "tooltip": {
-          "mode": "single"
-        }
+      "title": "Equilibrium Temperature Distribution",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
       },
+      "description": "1 parsec = 3.26 light-years. Kepler field \u2248 300\u20133000 pc.",
       "fieldConfig": {
         "defaults": {
           "color": {
             "fixedColor": "purple",
             "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
         }
-      }
-    },
-    {
-      "id": 21,
-      "type": "table",
-      "title": " Hottest Planets (Highest Eq. Temperature)",
+      },
       "gridPos": {
+        "h": 8,
+        "w": 12,
         "x": 0,
-        "y": 65,
-        "w": 8,
-        "h": 9
+        "y": 65
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
+      "id": 20,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "barWidthFactor": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Distance Range",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
       },
+      "pluginVersion": "13.0.1+security-01",
       "targets": [
         {
-          "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_eqt::numeric, 0) AS \"Eq. Temp (K)\", ROUND((pl_eqt - 273.15)::numeric, 0) AS \"Temp (°C)\", ROUND(pl_orbper::numeric, 3) AS \"Period (days)\", ROUND(pl_rade::numeric, 2) AS \"Radius (R⊕)\", disc_year AS \"Year\" FROM exoplanets WHERE pl_eqt IS NOT NULL ORDER BY pl_eqt DESC LIMIT 20",
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
           "format": "table",
+          "rawSql": "SELECT CASE WHEN sy_dist < 10 THEN '<10 pc (33 ly)' WHEN sy_dist < 50 THEN '10\u201350 pc' WHEN sy_dist < 100 THEN '50\u2013100 pc' WHEN sy_dist < 300 THEN '100\u2013300 pc' WHEN sy_dist < 500 THEN '300\u2013500 pc' WHEN sy_dist < 1000 THEN '500\u20131000 pc' WHEN sy_dist < 2000 THEN '1000\u20132000 pc' ELSE '2000\u20133000 pc' END AS \"Distance Range\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE sy_dist IS NOT NULL AND sy_dist < 3000 GROUP BY 1 ORDER BY MIN(sy_dist)",
           "refId": "A"
         }
       ],
-      "options": {},
+      "title": "Distance Distribution (parsecs < 3000)",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Planets ranked by mass in Earth masses (M\u2295) and Jupiter masses (M\u2643, where 1 M\u2643 = 317.83 M\u2295). Above ~13 M\u2643 objects are typically classified as brown dwarfs rather than planets. Mass is only measurable via radial velocity or transit timing \u2014 roughly 53% of confirmed planets have no measured mass, which is why this table is shorter than the radius table.",
       "fieldConfig": {
-        "defaults": {},
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Mass (M\u2295)"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "blue",
+                      "value": 0
+                    },
+                    {
+                      "color": "orange",
+                      "value": 1000
+                    },
+                    {
+                      "color": "red",
+                      "value": 5000
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 65
+      },
+      "id": 23,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_masse::numeric, 1) AS \"Mass (M\u2295)\", ROUND((pl_masse / 317.83)::numeric, 3) AS \"Mass (M\u2643)\", ROUND(pl_rade::numeric, 2) AS \"Radius (R\u2295)\", ROUND(pl_orbper::numeric, 2) AS \"Period (days)\", disc_year AS \"Year\" FROM exoplanets WHERE pl_masse IS NOT NULL ORDER BY pl_masse DESC LIMIT 20",
+          "refId": "A"
+        }
+      ],
+      "title": "Most Massive Planets",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Planets ranked by equilibrium temperature. KELT-9 b tops the list at 4,050 K \u2014 hotter than many stars, hot enough to vaporize iron. These are tidally locked hot Jupiters orbiting within 0.05 AU of their host star. Temperature color: orange = hot, red = above 2,000 K, dark red = above 3,000 K.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
         "overrides": [
           {
             "matcher": {
@@ -1002,7 +1814,7 @@
                   "steps": [
                     {
                       "color": "orange",
-                      "value": null
+                      "value": 0
                     },
                     {
                       "color": "red",
@@ -1014,45 +1826,74 @@
                     }
                   ]
                 }
-              },
-              {
-                "id": "custom.displayMode",
-                "value": "color-background"
               }
             ]
           }
         ]
       },
-      "description": "Planets ranked by equilibrium temperature. KELT-9 b tops the list at 4,050 K — hotter than many stars, hot enough to vaporize iron. These are tidally locked hot Jupiters orbiting within 0.05 AU of their host star. Temperature color: orange = hot, red = above 2,000 K, dark red = above 3,000 K."
-    },
-    {
-      "id": 22,
-      "type": "table",
-      "title": "Largest Planets by Radius",
       "gridPos": {
-        "x": 8,
-        "y": 65,
-        "w": 8,
-        "h": 9
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 73
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
+      "id": 21,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
       },
+      "pluginVersion": "13.0.1+security-01",
       "targets": [
         {
-          "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_rade::numeric, 2) AS \"Radius (R⊕)\", ROUND((pl_rade / 11.209)::numeric, 3) AS \"Radius (R♃)\", ROUND(pl_masse::numeric, 1) AS \"Mass (M⊕)\", ROUND(pl_orbper::numeric, 2) AS \"Period (days)\", disc_year AS \"Year\" FROM exoplanets WHERE pl_rade IS NOT NULL ORDER BY pl_rade DESC LIMIT 20",
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
           "format": "table",
+          "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_eqt::numeric, 0) AS \"Eq. Temp (K)\", ROUND((pl_eqt - 273.15)::numeric, 0) AS \"Temp (\u00b0C)\", ROUND(pl_orbper::numeric, 3) AS \"Period (days)\", ROUND(pl_rade::numeric, 2) AS \"Radius (R\u2295)\", disc_year AS \"Year\" FROM exoplanets WHERE pl_eqt IS NOT NULL ORDER BY pl_eqt DESC LIMIT 20",
           "refId": "A"
         }
       ],
-      "options": {},
+      "title": " Hottest Planets (Highest Eq. Temperature)",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Planets ranked by radius in Earth radii (R\u2295) and Jupiter radii (R\u2643, where 1 R\u2643 = 11.209 R\u2295). Values above ~20 R\u2295 are likely inflated hot Jupiters \u2014 stellar irradiation causes their atmospheres to expand significantly beyond what their mass alone would predict. Color: blue = Neptune-scale, purple = Jupiter-scale, red = inflated giant.",
       "fieldConfig": {
-        "defaults": {},
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
         "overrides": [
           {
             "matcher": {
               "id": "byName",
-              "options": "Radius (R⊕)"
+              "options": "Radius (R\u2295)"
             },
             "properties": [
               {
@@ -1062,7 +1903,7 @@
                   "steps": [
                     {
                       "color": "blue",
-                      "value": null
+                      "value": 0
                     },
                     {
                       "color": "purple",
@@ -1074,133 +1915,128 @@
                     }
                   ]
                 }
-              },
-              {
-                "id": "custom.displayMode",
-                "value": "color-background"
               }
             ]
           }
         ]
       },
-      "description": "Planets ranked by radius in Earth radii (R⊕) and Jupiter radii (R♃, where 1 R♃ = 11.209 R⊕). Values above ~20 R⊕ are likely inflated hot Jupiters — stellar irradiation causes their atmospheres to expand significantly beyond what their mass alone would predict. Color: blue = Neptune-scale, purple = Jupiter-scale, red = inflated giant."
-    },
-    {
-      "id": 23,
-      "type": "table",
-      "title": "Most Massive Planets",
       "gridPos": {
-        "x": 16,
-        "y": 65,
-        "w": 8,
-        "h": 9
-      },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
-      },
-      "targets": [
-        {
-          "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_masse::numeric, 1) AS \"Mass (M⊕)\", ROUND((pl_masse / 317.83)::numeric, 3) AS \"Mass (M♃)\", ROUND(pl_rade::numeric, 2) AS \"Radius (R⊕)\", ROUND(pl_orbper::numeric, 2) AS \"Period (days)\", disc_year AS \"Year\" FROM exoplanets WHERE pl_masse IS NOT NULL ORDER BY pl_masse DESC LIMIT 20",
-          "format": "table",
-          "refId": "A"
-        }
-      ],
-      "options": {},
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Mass (M⊕)"
-            },
-            "properties": [
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "blue",
-                      "value": null
-                    },
-                    {
-                      "color": "orange",
-                      "value": 1000
-                    },
-                    {
-                      "color": "red",
-                      "value": 5000
-                    }
-                  ]
-                }
-              },
-              {
-                "id": "custom.displayMode",
-                "value": "color-background"
-              }
-            ]
-          }
-        ]
-      },
-      "description": "Planets ranked by mass in Earth masses (M⊕) and Jupiter masses (M♃, where 1 M♃ = 317.83 M⊕). Above ~13 M♃ objects are typically classified as brown dwarfs rather than planets. Mass is only measurable via radial velocity or transit timing — roughly 53% of confirmed planets have no measured mass, which is why this table is shorter than the radius table."
-    },
-    {
-      "id": 24,
-      "type": "table",
-      "title": "Longest Orbital Periods — The Cold Outer Worlds",
-      "description": "For reference: Earth = 365.25 d, Jupiter = 4333 d (11.9 yr), Neptune = 60,190 d (164.8 yr)",
-      "gridPos": {
-        "x": 0,
-        "y": 74,
+        "h": 9,
         "w": 12,
-        "h": 8
-      },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
-      },
-      "targets": [
-        {
-          "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_orbper::numeric, 1) AS \"Period (days)\", ROUND((pl_orbper / 365.25)::numeric, 2) AS \"Period (years)\", ROUND(pl_rade::numeric, 2) AS \"Radius (R⊕)\", ROUND(pl_masse::numeric, 1) AS \"Mass (M⊕)\", ROUND(pl_orbsmax::numeric, 3) AS \"Semi-major Axis (AU)\", discoverymethod AS \"Method\", disc_year AS \"Year\" FROM exoplanets WHERE pl_orbper IS NOT NULL ORDER BY pl_orbper DESC LIMIT 20",
-          "format": "table",
-          "refId": "A"
-        }
-      ],
-      "options": {},
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "filterable": true
-          }
-        }
-      }
-    },
-    {
-      "id": 25,
-      "type": "table",
-      "title": "Coolest Stars Hosting Exoplanets (M-dwarfs)",
-      "description": "Red dwarfs (< 3700 K) are the most common stars and frequently host rocky planets in tight orbits",
-      "gridPos": {
         "x": 12,
-        "y": 74,
-        "w": 12,
-        "h": 8
+        "y": 73
       },
-      "datasource": {
-        "uid": "celestiaops-timescaledb"
+      "id": 22,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
       },
+      "pluginVersion": "13.0.1+security-01",
       "targets": [
         {
-          "rawSql": "SELECT hostname AS \"Star\", ROUND(MIN(st_teff)::numeric, 0) AS \"Star Temp (K)\", ROUND(MIN(st_rad)::numeric, 3) AS \"Star Radius (R☉)\", ROUND(MIN(st_mass)::numeric, 3) AS \"Star Mass (M☉)\", MAX(sy_pnum) AS \"Planets in System\", ROUND(MIN(sy_dist * 3.26156)::numeric, 2) AS \"Dist (ly)\", MIN(disc_year) AS \"First Disc.\" FROM exoplanets WHERE st_teff < 3700 AND st_teff IS NOT NULL GROUP BY hostname ORDER BY MIN(st_teff) ASC LIMIT 25",
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
           "format": "table",
+          "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_rade::numeric, 2) AS \"Radius (R\u2295)\", ROUND((pl_rade / 11.209)::numeric, 3) AS \"Radius (R\u2643)\", ROUND(pl_masse::numeric, 1) AS \"Mass (M\u2295)\", ROUND(pl_orbper::numeric, 2) AS \"Period (days)\", disc_year AS \"Year\" FROM exoplanets WHERE pl_rade IS NOT NULL ORDER BY pl_rade DESC LIMIT 20",
           "refId": "A"
         }
       ],
-      "options": {},
+      "title": "Largest Planets by Radius",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "For reference: Earth = 365.25 d, Jupiter = 4333 d (11.9 yr), Neptune = 60,190 d (164.8 yr)",
       "fieldConfig": {
         "defaults": {
           "custom": {
-            "filterable": true
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 82
+      },
+      "id": 24,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_orbper::numeric, 1) AS \"Period (days)\", ROUND((pl_orbper / 365.25)::numeric, 2) AS \"Period (years)\", ROUND(pl_rade::numeric, 2) AS \"Radius (R\u2295)\", ROUND(pl_masse::numeric, 1) AS \"Mass (M\u2295)\", ROUND(pl_orbsmax::numeric, 3) AS \"Semi-major Axis (AU)\", discoverymethod AS \"Method\", disc_year AS \"Year\" FROM exoplanets WHERE pl_orbper IS NOT NULL ORDER BY pl_orbper DESC LIMIT 20",
+          "refId": "A"
+        }
+      ],
+      "title": "Longest Orbital Periods \u2014 The Cold Outer Worlds",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Red dwarfs (< 3700 K) are the most common stars and frequently host rocky planets in tight orbits",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
         },
         "overrides": [
@@ -1217,7 +2053,7 @@
                   "steps": [
                     {
                       "color": "dark-red",
-                      "value": null
+                      "value": 0
                     },
                     {
                       "color": "red",
@@ -1229,15 +2065,65 @@
                     }
                   ]
                 }
-              },
-              {
-                "id": "custom.displayMode",
-                "value": "color-background"
               }
             ]
           }
         ]
-      }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 82
+      },
+      "id": 25,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT hostname AS \"Star\", ROUND(MIN(st_teff)::numeric, 0) AS \"Star Temp (K)\", ROUND(MIN(st_rad)::numeric, 3) AS \"Star Radius (R\u2609)\", ROUND(MIN(st_mass)::numeric, 3) AS \"Star Mass (M\u2609)\", MAX(sy_pnum) AS \"Planets in System\", ROUND(MIN(sy_dist * 3.26156)::numeric, 2) AS \"Dist (ly)\", MIN(disc_year) AS \"First Disc.\" FROM exoplanets WHERE st_teff < 3700 AND st_teff IS NOT NULL GROUP BY hostname ORDER BY MIN(st_teff) ASC LIMIT 25",
+          "refId": "A"
+        }
+      ],
+      "title": "Coolest Stars Hosting Exoplanets (M-dwarfs)",
+      "type": "table"
     }
-  ]
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 42,
+  "tags": [
+    "celestiaops",
+    "astronomy"
+  ],
+  "time": {
+    "from": "now-5y",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "CelestiaOps \u2014 Exoplanet Observatory",
+  "uid": "celestiaops-observatory",
+  "version": 16
 }

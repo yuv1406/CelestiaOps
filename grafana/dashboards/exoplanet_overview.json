@@ -1,145 +1,470 @@
 {
-  "title": "CelestiaOps — Exoplanet Overview",
-  "uid": "celestiaops-overview",
-  "version": 1,
+  "title": "CelestiaOps — Exoplanet Observatory",
+  "uid": "celestiaops-observatory",
+  "version": 2,
   "schemaVersion": 38,
-  "refresh": "1h",
-  "tags": ["celestiaops"],
+  "refresh": false,
+  "tags": ["celestiaops", "astronomy"],
+  "time": { "from": "now-5y", "to": "now" },
+  "timepicker": {},
   "panels": [
+
     {
       "id": 1,
-      "title": "Total Exoplanets",
-      "type": "stat",
-      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "uid": "celestiaops-timescaledb" },
-      "targets": [{
-        "rawSql": "SELECT COUNT(*) AS value FROM exoplanets",
-        "format": "table",
-        "refId": "A"
-      }],
-      "options": { "colorMode": "background", "graphMode": "none" },
-      "fieldConfig": { "defaults": { "color": { "fixedColor": "blue", "mode": "fixed" } } }
+      "type": "text",
+      "title": "",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 3 },
+      "options": {
+        "mode": "markdown",
+        "content": "# 🔭 CelestiaOps Exoplanet Observatory\nReal-time catalog of **confirmed exoplanets** sourced from the NASA Exoplanet Archive (TAP). Data ingested daily at 02:00 UTC. Earth baseline: radius = 1 R⊕, mass = 1 M⊕, orbital period = 365.25 days, equilibrium temperature ≈ 255 K (effective) / 288 K (surface). Habitable zone defined as equilibrium temperature 180 – 310 K."
+      }
     },
+
     {
       "id": 2,
-      "title": "Potentially Habitable",
       "type": "stat",
-      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
+      "title": "Total Confirmed Exoplanets",
+      "gridPos": { "x": 0, "y": 3, "w": 4, "h": 4 },
       "datasource": { "uid": "celestiaops-timescaledb" },
-      "targets": [{
-        "rawSql": "SELECT COUNT(*) AS value FROM exoplanets WHERE is_potentially_habitable = true",
-        "format": "table",
-        "refId": "A"
-      }],
-      "options": { "colorMode": "background", "graphMode": "none" },
-      "fieldConfig": { "defaults": { "color": { "fixedColor": "green", "mode": "fixed" } } }
+      "targets": [{ "rawSql": "SELECT COUNT(*) AS value FROM exoplanets", "format": "table", "refId": "A" }],
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "blue", "mode": "fixed" }, "unit": "short" } }
     },
+
     {
       "id": 3,
-      "title": "Last Sync",
       "type": "stat",
-      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
+      "title": "Habitable Zone Candidates",
+      "gridPos": { "x": 4, "y": 3, "w": 4, "h": 4 },
       "datasource": { "uid": "celestiaops-timescaledb" },
-      "targets": [{
-        "rawSql": "SELECT last_sync_at AS value FROM sync_state WHERE dag_id = 'ingest_exoplanets'",
-        "format": "table",
-        "refId": "A"
-      }],
-      "options": { "colorMode": "none", "graphMode": "none" },
-      "fieldConfig": { "defaults": { "unit": "dateTimeAsIso" } }
+      "targets": [{ "rawSql": "SELECT COUNT(*) AS value FROM exoplanets WHERE is_potentially_habitable = true", "format": "table", "refId": "A" }],
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "green", "mode": "fixed" }, "unit": "short" } }
     },
+
     {
       "id": 4,
-      "title": "Discoveries by Year",
-      "type": "barchart",
-      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "type": "stat",
+      "title": "Sun-like Host Stars (G-type)",
+      "gridPos": { "x": 8, "y": 3, "w": 4, "h": 4 },
       "datasource": { "uid": "celestiaops-timescaledb" },
-      "targets": [{
-        "rawSql": "SELECT disc_year AS year, COUNT(*) AS discoveries FROM exoplanets WHERE disc_year IS NOT NULL GROUP BY disc_year ORDER BY disc_year",
-        "format": "table",
-        "refId": "A"
-      }],
-      "fieldConfig": {
-        "defaults": { "color": { "mode": "palette-classic" } },
-        "overrides": [{ "matcher": { "id": "byName", "options": "year" }, "properties": [{ "id": "custom.axisLabel", "value": "Year" }] }]
-      },
-      "options": { "xField": "year" }
+      "targets": [{ "rawSql": "SELECT COUNT(DISTINCT hostname) AS value FROM exoplanets WHERE st_teff BETWEEN 5200 AND 6000", "format": "table", "refId": "A" }],
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "yellow", "mode": "fixed" }, "unit": "short" } }
     },
+
     {
       "id": 5,
-      "title": "Discovery Methods",
-      "type": "piechart",
-      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "type": "stat",
+      "title": "Multi-Planet Systems",
+      "gridPos": { "x": 12, "y": 3, "w": 4, "h": 4 },
       "datasource": { "uid": "celestiaops-timescaledb" },
-      "targets": [{
-        "rawSql": "SELECT discoverymethod AS method, COUNT(*) AS count FROM exoplanets WHERE discoverymethod IS NOT NULL GROUP BY discoverymethod ORDER BY count DESC",
-        "format": "table",
-        "refId": "A"
-      }],
-      "options": { "pieType": "donut", "displayLabels": ["name", "percent"] }
+      "targets": [{ "rawSql": "SELECT COUNT(DISTINCT hostname) AS value FROM exoplanets WHERE sy_pnum >= 2", "format": "table", "refId": "A" }],
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "purple", "mode": "fixed" }, "unit": "short" } }
     },
+
     {
       "id": 6,
-      "title": "Planet Radius vs Mass",
-      "type": "scatter",
-      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+      "type": "stat",
+      "title": "Nearest Exoplanet (ly)",
+      "gridPos": { "x": 16, "y": 3, "w": 4, "h": 4 },
       "datasource": { "uid": "celestiaops-timescaledb" },
-      "targets": [{
-        "rawSql": "SELECT pl_rade AS radius_earth, pl_masse AS mass_earth, is_potentially_habitable FROM exoplanets WHERE pl_rade IS NOT NULL AND pl_masse IS NOT NULL AND pl_rade < 20 AND pl_masse < 1000",
-        "format": "table",
-        "refId": "A"
-      }],
-      "fieldConfig": {
-        "defaults": { "custom": { "pointSize": { "fixed": 4 } } },
-        "overrides": [
-          { "matcher": { "id": "byName", "options": "radius_earth" }, "properties": [{ "id": "custom.axisLabel", "value": "Radius (Earth radii)" }] },
-          { "matcher": { "id": "byName", "options": "mass_earth" }, "properties": [{ "id": "custom.axisLabel", "value": "Mass (Earth masses)" }] }
-        ]
-      },
-      "options": { "xField": "radius_earth", "yField": "mass_earth" }
+      "targets": [{ "rawSql": "SELECT ROUND((MIN(sy_dist) * 3.26156)::numeric, 2) AS value FROM exoplanets WHERE sy_dist IS NOT NULL", "format": "table", "refId": "A" }],
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "orange", "mode": "fixed" }, "decimals": 2, "unit": "none" } }
     },
+
     {
       "id": 7,
-      "title": "Equilibrium Temperature Distribution",
-      "type": "histogram",
-      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "type": "stat",
+      "title": "Last Ingest",
+      "gridPos": { "x": 20, "y": 3, "w": 4, "h": 4 },
       "datasource": { "uid": "celestiaops-timescaledb" },
-      "targets": [{
-        "rawSql": "SELECT pl_eqt AS temperature_k FROM exoplanets WHERE pl_eqt IS NOT NULL AND pl_eqt BETWEEN 100 AND 3000",
-        "format": "table",
-        "refId": "A"
-      }],
-      "fieldConfig": { "defaults": { "unit": "celsius", "custom": { "fillOpacity": 80 } } },
-      "options": { "bucketSize": "auto", "fillOpacity": 80 }
+      "targets": [{ "rawSql": "SELECT TO_CHAR(last_sync_at AT TIME ZONE 'UTC', 'YYYY-MM-DD HH24:MI') AS value FROM sync_state WHERE dag_id = 'ingest_exoplanets'", "format": "table", "refId": "A" }],
+      "options": { "colorMode": "none", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": {} }
     },
+
     {
       "id": 8,
-      "title": "Distance Distribution (parsecs)",
-      "type": "histogram",
-      "gridPos": { "x": 0, "y": 20, "w": 12, "h": 8 },
+      "type": "piechart",
+      "title": "Planet Classification by Radius",
+      "description": "Rocky < 1.5 R⊕ | Super-Earth 1.5–2.5 | Sub-Neptune 2.5–4 | Neptune-like 4–10 | Gas Giant > 10",
+      "gridPos": { "x": 0, "y": 7, "w": 8, "h": 9 },
       "datasource": { "uid": "celestiaops-timescaledb" },
       "targets": [{
-        "rawSql": "SELECT sy_dist AS distance_pc FROM exoplanets WHERE sy_dist IS NOT NULL AND sy_dist < 3000",
+        "rawSql": "SELECT CASE WHEN pl_rade < 1.5 THEN '🪨 Rocky (<1.5 R⊕)' WHEN pl_rade < 2.5 THEN '🌍 Super-Earth (1.5–2.5)' WHEN pl_rade < 4.0 THEN '🌫 Sub-Neptune (2.5–4)' WHEN pl_rade < 10.0 THEN '🔵 Neptune-like (4–10)' ELSE '🪐 Gas Giant (>10)' END AS \"Type\", COUNT(*) AS \"Count\" FROM exoplanets WHERE pl_rade IS NOT NULL GROUP BY 1 ORDER BY 2 DESC",
         "format": "table",
         "refId": "A"
       }],
-      "fieldConfig": { "defaults": { "unit": "pc", "custom": { "fillOpacity": 80 } } },
-      "options": { "bucketSize": "auto", "fillOpacity": 80 }
+      "options": { "pieType": "donut", "displayLabels": ["name", "percent"], "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] } }
     },
+
     {
       "id": 9,
-      "title": "Multi-Planet Systems",
+      "type": "piechart",
+      "title": "Host Star Spectral Classification",
+      "description": "M < 3700K (red dwarf) | K 3700–5200K | G 5200–6000K (Sun-like) | F 6000–7500K | A+ > 7500K",
+      "gridPos": { "x": 8, "y": 7, "w": 8, "h": 9 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT CASE WHEN st_teff < 3700 THEN 'M — Red Dwarf (<3700 K)' WHEN st_teff < 5200 THEN 'K — Orange (3700–5200 K)' WHEN st_teff < 6000 THEN 'G — Sun-like (5200–6000 K)' WHEN st_teff < 7500 THEN 'F — Yellow-White (6000–7500 K)' ELSE 'A+ — Hot (>7500 K)' END AS \"Spectral Type\", COUNT(*) AS \"Count\" FROM exoplanets WHERE st_teff IS NOT NULL GROUP BY 1 ORDER BY 2 DESC",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": { "pieType": "donut", "displayLabels": ["name", "percent"], "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] } }
+    },
+
+    {
+      "id": 10,
+      "type": "piechart",
+      "title": "Discovery Methods",
+      "gridPos": { "x": 16, "y": 7, "w": 8, "h": 9 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT discoverymethod AS \"Method\", COUNT(*) AS \"Count\" FROM exoplanets WHERE discoverymethod IS NOT NULL GROUP BY 1 ORDER BY 2 DESC",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": { "pieType": "donut", "displayLabels": ["name", "percent"], "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] } }
+    },
+
+    {
+      "id": 11,
       "type": "barchart",
+      "title": "Annual Discoveries",
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT disc_year::text AS \"Year\", COUNT(*) AS \"New Planets Confirmed\" FROM exoplanets WHERE disc_year IS NOT NULL GROUP BY disc_year ORDER BY disc_year",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": { "xField": "Year", "barWidthFactor": 0.9, "tooltip": { "mode": "single" } },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" } } }
+    },
+
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Cumulative Exoplanet Count Over Time",
       "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
       "datasource": { "uid": "celestiaops-timescaledb" },
       "targets": [{
-        "rawSql": "SELECT sy_pnum AS planets_in_system, COUNT(DISTINCT hostname) AS star_systems FROM exoplanets WHERE sy_pnum IS NOT NULL GROUP BY sy_pnum ORDER BY sy_pnum",
+        "rawSql": "SELECT make_date(disc_year::int, 6, 1) AS \"time\", SUM(COUNT(*)) OVER (ORDER BY disc_year) AS \"Cumulative Planets\" FROM exoplanets WHERE disc_year IS NOT NULL GROUP BY disc_year ORDER BY disc_year",
+        "format": "time_series",
+        "refId": "A"
+      }],
+      "options": {
+        "tooltip": { "mode": "single" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "green", "mode": "fixed" },
+          "custom": { "lineWidth": 2, "fillOpacity": 15 }
+        }
+      }
+    },
+
+    {
+      "id": 13,
+      "type": "table",
+      "title": "Planet Catalog — All Confirmed Exoplanets",
+      "gridPos": { "x": 0, "y": 24, "w": 24, "h": 13 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Host Star\", disc_year AS \"Year\", discoverymethod AS \"Method\", ROUND(pl_rade::numeric, 2) AS \"Radius (R⊕)\", ROUND(pl_masse::numeric, 2) AS \"Mass (M⊕)\", ROUND(pl_orbper::numeric, 2) AS \"Period (days)\", ROUND(pl_eqt::numeric, 0) AS \"Eq. Temp (K)\", ROUND(sy_dist::numeric, 1) AS \"Dist (pc)\", ROUND((sy_dist * 3.26156)::numeric, 1) AS \"Dist (ly)\", sy_pnum AS \"# Planets in System\", CASE WHEN is_potentially_habitable THEN 'HZ' ELSE '' END AS \"HZ\" FROM exoplanets ORDER BY disc_year DESC, pl_name LIMIT 2000",
         "format": "table",
         "refId": "A"
       }],
-      "options": { "xField": "planets_in_system" }
+      "options": { "sortBy": [{ "displayName": "Year", "desc": true }] },
+      "fieldConfig": {
+        "defaults": { "custom": { "filterable": true } },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "HZ" },
+            "properties": [
+              { "id": "custom.width", "value": 50 },
+              { "id": "custom.displayMode", "value": "color-background" },
+              { "id": "mappings", "value": [{ "type": "value", "options": { "HZ": { "color": "green", "index": 0 } } }] }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Eq. Temp (K)" },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }, { "color": "green", "value": 180 }, { "color": "orange", "value": 310 }, { "color": "red", "value": 800 }] }
+              },
+              { "id": "custom.displayMode", "value": "color-background" }
+            ]
+          },
+          { "matcher": { "id": "byName", "options": "Radius (R⊕)" }, "properties": [{ "id": "decimals", "value": 2 }] },
+          { "matcher": { "id": "byName", "options": "Mass (M⊕)" }, "properties": [{ "id": "decimals", "value": 2 }] }
+        ]
+      }
+    },
+
+    {
+      "id": 14,
+      "type": "table",
+      "title": "🌱 Habitable Zone Candidates — Ordered by Earth Temperature Similarity",
+      "description": "Planets with equilibrium temperature 180–310 K, closest to Earth's ~288 K surface average",
+      "gridPos": { "x": 0, "y": 37, "w": 12, "h": 10 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_rade::numeric, 2) AS \"Radius (R⊕)\", ROUND(pl_masse::numeric, 2) AS \"Mass (M⊕)\", ROUND(pl_eqt::numeric, 0) AS \"Eq. Temp (K)\", ROUND((pl_eqt - 288)::numeric, 0) AS \"ΔT vs Earth (K)\", ROUND(sy_dist::numeric, 1) AS \"Dist (pc)\", ROUND((sy_dist * 3.26156)::numeric, 1) AS \"Dist (ly)\", disc_year AS \"Year\", discoverymethod AS \"Method\" FROM exoplanets WHERE is_potentially_habitable = true ORDER BY ABS(COALESCE(pl_eqt, 9999) - 288), pl_name",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": {},
+      "fieldConfig": {
+        "defaults": { "custom": { "filterable": true } },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "ΔT vs Earth (K)" },
+            "properties": [
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 30 }, { "color": "orange", "value": 60 }] } },
+              { "id": "custom.displayMode", "value": "color-background" }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
+      "id": 15,
+      "type": "table",
+      "title": "📡 Nearest Exoplanets to Earth",
+      "gridPos": { "x": 12, "y": 37, "w": 12, "h": 10 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND((sy_dist * 3.26156)::numeric, 3) AS \"Distance (ly)\", ROUND(sy_dist::numeric, 3) AS \"Distance (pc)\", ROUND(pl_rade::numeric, 2) AS \"Radius (R⊕)\", ROUND(pl_masse::numeric, 2) AS \"Mass (M⊕)\", ROUND(pl_eqt::numeric, 0) AS \"Eq. Temp (K)\", disc_year AS \"Year\", CASE WHEN is_potentially_habitable THEN 'HZ' ELSE '' END AS \"HZ\" FROM exoplanets WHERE sy_dist IS NOT NULL ORDER BY sy_dist ASC LIMIT 30",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": {},
+      "fieldConfig": {
+        "defaults": { "custom": { "filterable": true } },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "HZ" },
+            "properties": [
+              { "id": "custom.width", "value": 50 },
+              { "id": "custom.displayMode", "value": "color-background" },
+              { "id": "mappings", "value": [{ "type": "value", "options": { "HZ": { "color": "green", "index": 0 } } }] }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Distance (ly)" },
+            "properties": [
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 50 }, { "color": "orange", "value": 200 }, { "color": "red", "value": 1000 }] } },
+              { "id": "custom.displayMode", "value": "color-background" }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
+      "id": 16,
+      "type": "xychart",
+      "title": "Planet Radius vs Mass — Size Classification Map",
+      "description": "Earth = (1, 1). Neptune ≈ (3.9, 17). Saturn ≈ (9.4, 95). Jupiter ≈ (11.2, 318). Filter: radius < 20 R⊕, mass < 500 M⊕",
+      "gridPos": { "x": 0, "y": 47, "w": 14, "h": 10 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT ROUND(pl_rade::numeric, 3) AS \"Radius (R⊕)\", ROUND(pl_masse::numeric, 3) AS \"Mass (M⊕)\", CASE WHEN pl_rade < 1.5 THEN 'Rocky' WHEN pl_rade < 2.5 THEN 'Super-Earth' WHEN pl_rade < 4.0 THEN 'Sub-Neptune' WHEN pl_rade < 10.0 THEN 'Neptune-like' ELSE 'Gas Giant' END AS \"Type\" FROM exoplanets WHERE pl_rade IS NOT NULL AND pl_masse IS NOT NULL AND pl_rade < 20 AND pl_masse < 500 ORDER BY pl_rade",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": { "mapping": "auto", "tooltip": { "mode": "single" } }
+    },
+
+    {
+      "id": 17,
+      "type": "table",
+      "title": "🌌 Most Prolific Multi-Planet Systems",
+      "gridPos": { "x": 14, "y": 47, "w": 10, "h": 10 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT hostname AS \"Star System\", MAX(sy_pnum) AS \"Planets\", COUNT(*) AS \"Confirmed\", MIN(disc_year) AS \"First Disc.\", ROUND(AVG(pl_orbper)::numeric, 1) AS \"Avg Period (days)\", ROUND(AVG(pl_rade)::numeric, 2) AS \"Avg Radius (R⊕)\", ROUND(MIN(sy_dist * 3.26156)::numeric, 1) AS \"Dist (ly)\" FROM exoplanets WHERE sy_pnum >= 3 GROUP BY hostname, sy_pnum ORDER BY sy_pnum DESC, hostname LIMIT 30",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": { "sortBy": [{ "displayName": "Planets", "desc": true }] },
+      "fieldConfig": {
+        "defaults": { "custom": { "filterable": true } },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Planets" },
+            "properties": [
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }, { "color": "green", "value": 4 }, { "color": "yellow", "value": 6 }, { "color": "orange", "value": 8 }] } },
+              { "id": "custom.displayMode", "value": "color-background" }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
+      "id": 18,
+      "type": "histogram",
+      "title": "Orbital Period Distribution (days < 1000)",
+      "description": "Earth = 365.25 days. Most close-in transiting planets have periods < 10 days.",
+      "gridPos": { "x": 0, "y": 57, "w": 8, "h": 8 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{ "rawSql": "SELECT pl_orbper AS \"Orbital Period (days)\" FROM exoplanets WHERE pl_orbper IS NOT NULL AND pl_orbper BETWEEN 0.1 AND 1000", "format": "table", "refId": "A" }],
+      "options": { "bucketSize": "auto", "fillOpacity": 70, "gradientMode": "opacity" },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "blue", "mode": "fixed" }, "custom": { "fillOpacity": 70 } } }
+    },
+
+    {
+      "id": 19,
+      "type": "histogram",
+      "title": "Equilibrium Temperature Distribution",
+      "description": "Green band = habitable zone (180–310 K). Earth effective temp ≈ 255 K.",
+      "gridPos": { "x": 8, "y": 57, "w": 8, "h": 8 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{ "rawSql": "SELECT pl_eqt AS \"Eq. Temperature (K)\" FROM exoplanets WHERE pl_eqt IS NOT NULL AND pl_eqt BETWEEN 100 AND 4500", "format": "table", "refId": "A" }],
+      "options": { "bucketSize": "auto", "fillOpacity": 70, "gradientMode": "opacity" },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "orange", "mode": "fixed" }, "custom": { "fillOpacity": 70 } } }
+    },
+
+    {
+      "id": 20,
+      "type": "histogram",
+      "title": "Distance Distribution (parsecs < 3000)",
+      "description": "1 parsec = 3.26 light-years. Kepler field ≈ 300–3000 pc.",
+      "gridPos": { "x": 16, "y": 57, "w": 8, "h": 8 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{ "rawSql": "SELECT sy_dist AS \"Distance (parsecs)\" FROM exoplanets WHERE sy_dist IS NOT NULL AND sy_dist < 3000", "format": "table", "refId": "A" }],
+      "options": { "bucketSize": "auto", "fillOpacity": 70, "gradientMode": "opacity" },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "purple", "mode": "fixed" }, "custom": { "fillOpacity": 70 } } }
+    },
+
+    {
+      "id": 21,
+      "type": "table",
+      "title": "🔥 Hottest Planets (Highest Eq. Temperature)",
+      "gridPos": { "x": 0, "y": 65, "w": 8, "h": 9 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_eqt::numeric, 0) AS \"Eq. Temp (K)\", ROUND((pl_eqt - 273.15)::numeric, 0) AS \"Temp (°C)\", ROUND(pl_orbper::numeric, 3) AS \"Period (days)\", ROUND(pl_rade::numeric, 2) AS \"Radius (R⊕)\", disc_year AS \"Year\" FROM exoplanets WHERE pl_eqt IS NOT NULL ORDER BY pl_eqt DESC LIMIT 20",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": {},
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Eq. Temp (K)" },
+            "properties": [
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "orange", "value": null }, { "color": "red", "value": 2000 }, { "color": "dark-red", "value": 3000 }] } },
+              { "id": "custom.displayMode", "value": "color-background" }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
+      "id": 22,
+      "type": "table",
+      "title": "🪐 Largest Planets by Radius",
+      "gridPos": { "x": 8, "y": 65, "w": 8, "h": 9 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_rade::numeric, 2) AS \"Radius (R⊕)\", ROUND((pl_rade / 11.209)::numeric, 3) AS \"Radius (R♃)\", ROUND(pl_masse::numeric, 1) AS \"Mass (M⊕)\", ROUND(pl_orbper::numeric, 2) AS \"Period (days)\", disc_year AS \"Year\" FROM exoplanets WHERE pl_rade IS NOT NULL ORDER BY pl_rade DESC LIMIT 20",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": {},
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Radius (R⊕)" },
+            "properties": [
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }, { "color": "purple", "value": 10 }, { "color": "red", "value": 20 }] } },
+              { "id": "custom.displayMode", "value": "color-background" }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
+      "id": 23,
+      "type": "table",
+      "title": "💪 Most Massive Planets",
+      "gridPos": { "x": 16, "y": 65, "w": 8, "h": 9 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_masse::numeric, 1) AS \"Mass (M⊕)\", ROUND((pl_masse / 317.83)::numeric, 3) AS \"Mass (M♃)\", ROUND(pl_rade::numeric, 2) AS \"Radius (R⊕)\", ROUND(pl_orbper::numeric, 2) AS \"Period (days)\", disc_year AS \"Year\" FROM exoplanets WHERE pl_masse IS NOT NULL ORDER BY pl_masse DESC LIMIT 20",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": {},
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Mass (M⊕)" },
+            "properties": [
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }, { "color": "orange", "value": 1000 }, { "color": "red", "value": 5000 }] } },
+              { "id": "custom.displayMode", "value": "color-background" }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
+      "id": 24,
+      "type": "table",
+      "title": "⏳ Longest Orbital Periods — The Cold Outer Worlds",
+      "description": "For reference: Earth = 365.25 d, Jupiter = 4333 d (11.9 yr), Neptune = 60,190 d (164.8 yr)",
+      "gridPos": { "x": 0, "y": 74, "w": 12, "h": 8 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT pl_name AS \"Planet\", hostname AS \"Star\", ROUND(pl_orbper::numeric, 1) AS \"Period (days)\", ROUND((pl_orbper / 365.25)::numeric, 2) AS \"Period (years)\", ROUND(pl_rade::numeric, 2) AS \"Radius (R⊕)\", ROUND(pl_masse::numeric, 1) AS \"Mass (M⊕)\", ROUND(pl_orbsmax::numeric, 3) AS \"Semi-major Axis (AU)\", discoverymethod AS \"Method\", disc_year AS \"Year\" FROM exoplanets WHERE pl_orbper IS NOT NULL ORDER BY pl_orbper DESC LIMIT 20",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": {},
+      "fieldConfig": { "defaults": { "custom": { "filterable": true } } }
+    },
+
+    {
+      "id": 25,
+      "type": "table",
+      "title": "🌡 Coolest Stars Hosting Exoplanets (M-dwarfs)",
+      "description": "Red dwarfs (< 3700 K) are the most common stars and frequently host rocky planets in tight orbits",
+      "gridPos": { "x": 12, "y": 74, "w": 12, "h": 8 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT hostname AS \"Star\", ROUND(MIN(st_teff)::numeric, 0) AS \"Star Temp (K)\", ROUND(MIN(st_rad)::numeric, 3) AS \"Star Radius (R☉)\", ROUND(MIN(st_mass)::numeric, 3) AS \"Star Mass (M☉)\", MAX(sy_pnum) AS \"Planets in System\", ROUND(MIN(sy_dist * 3.26156)::numeric, 2) AS \"Dist (ly)\", MIN(disc_year) AS \"First Disc.\" FROM exoplanets WHERE st_teff < 3700 AND st_teff IS NOT NULL GROUP BY hostname ORDER BY MIN(st_teff) ASC LIMIT 25",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": {},
+      "fieldConfig": {
+        "defaults": { "custom": { "filterable": true } },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Star Temp (K)" },
+            "properties": [
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "dark-red", "value": null }, { "color": "red", "value": 3000 }, { "color": "orange", "value": 3500 }] } },
+              { "id": "custom.displayMode", "value": "color-background" }
+            ]
+          }
+        ]
+      }
     }
-  ],
-  "time": { "from": "now-1y", "to": "now" },
-  "timepicker": {}
+
+  ]
 }

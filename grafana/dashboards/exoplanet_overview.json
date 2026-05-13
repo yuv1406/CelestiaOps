@@ -1,7 +1,7 @@
 {
   "title": "CelestiaOps — Exoplanet Observatory",
   "uid": "celestiaops-observatory",
-  "version": 8,
+  "version": 10,
   "schemaVersion": 38,
   "refresh": false,
   "tags": [
@@ -894,7 +894,7 @@
       "id": 19,
       "type": "barchart",
       "title": "Equilibrium Temperature Distribution",
-      "description": "Green band = habitable zone (180–310 K). Earth effective temp ≈ 255 K.",
+      "description": "Planet count by equilibrium temperature bucket. The 180–310 K range is the conservative habitable zone (HZ) — where liquid water could exist on the surface. Earth's effective temperature is ~255 K. Note: all bars share the same color; the x-axis labels identify each bucket.",
       "gridPos": {
         "x": 8,
         "y": 57,
@@ -906,14 +906,13 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT 'a <180K (Frozen)' AS \"Temp Range\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE pl_eqt < 180 UNION ALL SELECT 'b 180-310K (HZ)', COUNT(*) FROM exoplanets WHERE pl_eqt >= 180 AND pl_eqt < 310 UNION ALL SELECT 'c 310-500K (Hot)', COUNT(*) FROM exoplanets WHERE pl_eqt >= 310 AND pl_eqt < 500 UNION ALL SELECT 'd 500-1000K (Very Hot)', COUNT(*) FROM exoplanets WHERE pl_eqt >= 500 AND pl_eqt < 1000 UNION ALL SELECT 'e 1000-2000K (Lava)', COUNT(*) FROM exoplanets WHERE pl_eqt >= 1000 AND pl_eqt < 2000 UNION ALL SELECT 'f >2000K (Ultra-Hot)', COUNT(*) FROM exoplanets WHERE pl_eqt >= 2000",
+          "rawSql": "SELECT CASE WHEN pl_eqt < 180 THEN '<180K (Frozen)' WHEN pl_eqt < 310 THEN '180-310K (Habitable Zone)' WHEN pl_eqt < 500 THEN '310-500K (Hot)' WHEN pl_eqt < 1000 THEN '500-1000K (Very Hot)' WHEN pl_eqt < 2000 THEN '1000-2000K (Lava)' ELSE '>2000K (Ultra-Hot)' END AS \"Temp Range\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE pl_eqt IS NOT NULL GROUP BY 1 ORDER BY MIN(pl_eqt)",
           "format": "table",
           "refId": "A"
         }
       ],
       "options": {
         "xField": "Temp Range",
-        "colorByField": "Temp Range",
         "barWidthFactor": 0.8,
         "tooltip": {
           "mode": "single"
@@ -926,101 +925,10 @@
         "defaults": {
           "color": {
             "mode": "fixed",
-            "fixedColor": "blue"
+            "fixedColor": "green"
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "a <180K (Frozen)"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "light-blue"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "b 180-310K (HZ)"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "green"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "c 310-500K (Hot)"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "yellow"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "d 500-1000K (Very Hot)"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "orange"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "e 1000-2000K (Lava)"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "red"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "f >2000K (Ultra-Hot)"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "dark-red"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       }
     },
     {

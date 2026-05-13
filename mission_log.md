@@ -32,6 +32,20 @@ Directories: `/data/celestiaops/{timescaledb,opensearch,grafana}`
 
 ---
 
+## 2026-05-13 — Bug: Three Import and Timezone Fixes Across DAGs
+
+**Bugs fixed:**
+
+1. **`ingest_exoplanets.py` — wrong operator import path:** `from plugins.operators...` fails because Airflow adds `plugins/` itself to `sys.path`, making `plugins` not a package. Fixed to `from operators.nasa_to_postgres_operator import ...`
+
+2. **`ingest_exoplanets.py` + `snapshot_history.py` — `include` not on path:** `from include.config.settings import ...` fails at runtime since `/opt/airflow` is not on `sys.path` by default. Fixed with `sys.path.insert(0, "/opt/airflow")` before the import in both DAGs.
+
+3. **`snapshot_history.py` — timezone-naive datetime comparison:** `datetime.now(timezone.utc) - last_sync` throws `TypeError` if PostgreSQL returns a naive datetime (no tzinfo). Fixed by coercing `last_sync` to UTC if naive.
+
+4. **`nasa_to_csv_operator.py` — test fetch limit:** Now fetches 500 rows via `SELECT TOP 500` in the ADQL query (TAP respects TOP in the query string, not as a URL param). Renamed `NASA_FETCH_CHUNK` → `NASA_FETCH_LIMIT = 500`.
+
+---
+
 ## 2026-05-13 — Bug: NASA TAP Pagination Loop Was Infinite
 
 **Decision:** Removed pagination loop from `_fetch_all_planets` in both `NasaToPostgresOperator` and `NasaToCsvOperator`. Now fetches all rows in a single request.

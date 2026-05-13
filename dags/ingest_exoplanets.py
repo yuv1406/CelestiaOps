@@ -10,14 +10,16 @@ Task chain:
   ensure_schema → ingest_nasa_data → notify_downstream
 """
 
+import sys
 from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
+sys.path.insert(0, "/opt/airflow")
 from include.config.settings import POSTGRES_CONN_ID
-from plugins.operators.nasa_to_postgres_operator import NasaToPostgresOperator
+from operators.nasa_to_postgres_operator import NasaToPostgresOperator
 
 DEFAULT_ARGS = {
     "owner": "celestiaops",

@@ -1,7 +1,7 @@
 {
   "title": "CelestiaOps — Exoplanet Observatory",
   "uid": "celestiaops-observatory",
-  "version": 6,
+  "version": 7,
   "schemaVersion": 38,
   "refresh": false,
   "tags": [
@@ -288,12 +288,11 @@
       "options": {
         "pieType": "donut",
         "displayLabels": [
-          "name",
           "percent"
         ],
         "legend": {
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "values": [
             "value",
             "percent"
@@ -325,12 +324,11 @@
       "options": {
         "pieType": "donut",
         "displayLabels": [
-          "name",
           "percent"
         ],
         "legend": {
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "values": [
             "value",
             "percent"
@@ -361,12 +359,11 @@
       "options": {
         "pieType": "donut",
         "displayLabels": [
-          "name",
           "percent"
         ],
         "legend": {
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "values": [
             "value",
             "percent"
@@ -919,7 +916,10 @@
         "tooltip": {
           "mode": "single"
         },
-        "xField": "field"
+        "xField": "field",
+        "legend": {
+          "displayMode": "hidden"
+        }
       },
       "fieldConfig": {
         "defaults": {

@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from airflow.providers.postgres.operators.postgres import PostgresOperator
+from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 sys.path.insert(0, "/opt/airflow")
 from include.config.settings import POSTGRES_CONN_ID
@@ -40,10 +40,14 @@ with DAG(
     doc_md=__doc__,
 ) as dag:
 
-    ensure_schema = PostgresOperator(
+    def _ensure_schema():
+        hook = PostgresHook(postgres_conn_id=POSTGRES_CONN_ID)
+        sql = open("/opt/airflow/include/sql/create_tables.sql").read()
+        hook.run(sql)
+
+    ensure_schema = PythonOperator(
         task_id="ensure_schema",
-        postgres_conn_id=POSTGRES_CONN_ID,
-        sql="/opt/airflow/include/sql/create_tables.sql",
+        python_callable=_ensure_schema,
     )
 
     ingest = NasaToPostgresOperator(

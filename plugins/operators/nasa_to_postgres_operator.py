@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+import sys
 from datetime import datetime, timezone
 from typing import Any
 
@@ -9,6 +10,7 @@ from airflow.models import BaseOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from psycopg2.extras import execute_values
 
+sys.path.insert(0, "/opt/airflow")
 from include.config.settings import (
     CHECKSUM_COLUMNS,
     HZ_TEMP_MAX,

@@ -55,29 +55,16 @@ class NasaToPostgresOperator(BaseOperator):
 
     def _fetch_all_planets(self) -> list[dict]:
         cols = ",".join(NASA_COLUMNS)
-        all_rows: list[dict] = []
-        offset = 0
-
-        while True:
-            params = {
-                "QUERY": f"SELECT {cols} FROM {NASA_TABLE}",
-                "FORMAT": "json",
-                "TOP": NASA_FETCH_CHUNK,
-                "OFFSET": offset,
-            }
-            log.info("Fetching NASA TAP rows offset=%d limit=%d", offset, NASA_FETCH_CHUNK)
-            resp = requests.get(NASA_TAP_BASE_URL, params=params, timeout=120)
-            resp.raise_for_status()
-            batch = resp.json()
-            if not batch:
-                break
-            all_rows.extend(batch)
-            log.info("Fetched %d rows (total so far: %d)", len(batch), len(all_rows))
-            if len(batch) < NASA_FETCH_CHUNK:
-                break
-            offset += NASA_FETCH_CHUNK
-
-        return all_rows
+        params = {
+            "QUERY": f"SELECT {cols} FROM {NASA_TABLE}",
+            "FORMAT": "json",
+        }
+        log.info("Fetching all NASA TAP rows in one request")
+        resp = requests.get(NASA_TAP_BASE_URL, params=params, timeout=120)
+        resp.raise_for_status()
+        rows = resp.json()
+        log.info("Fetched %d rows", len(rows))
+        return rows
 
     # ------------------------------------------------------------------
     # Transform

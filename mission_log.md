@@ -32,6 +32,33 @@ Directories: `/data/celestiaops/{timescaledb,opensearch,grafana}`
 
 ---
 
+## 2026-05-13 — Bug: NASA TAP Pagination Loop Was Infinite
+
+**Decision:** Removed pagination loop from `_fetch_all_planets` in both `NasaToPostgresOperator` and `NasaToCsvOperator`. Now fetches all rows in a single request.
+
+**Why:** The NASA TAP API ignores `TOP` and `OFFSET` as URL parameters — it returns the full dataset (6,286 rows) on every request regardless. The break condition `len(batch) < NASA_FETCH_CHUNK` (5000) was never true since 6,286 > 5,000, causing an infinite fetch loop. Caught during test DAG run on `test/file-output` branch.
+
+**What changed:**
+- `plugins/operators/nasa_to_postgres_operator.py` — replaced pagination `while` loop with a single `requests.get`
+- `plugins/operators/nasa_to_csv_operator.py` — same fix
+- `NASA_FETCH_CHUNK` constant in `settings.py` is now unused (left in place for now)
+
+---
+
+## 2026-05-13 — Testing: File-Output Branch for DAG Validation Without DB
+
+**Decision:** Created `test/file-output` branch with `NasaToCsvOperator` and `test_ingest_exoplanets` DAG that writes NASA fetch results to `/opt/airflow/results/` as CSV instead of upserting into TimescaleDB.
+
+**Why:** Needed a way to validate the full fetch → transform pipeline (pagination, checksums, habitability flag) without requiring a live TimescaleDB connection. CSV output lands at `airflow-stack/results/exoplanets_<run_id>.csv` on the host via the existing volume mount.
+
+**What changed:**
+- `CelestiaOps/plugins/operators/nasa_to_csv_operator.py` — self-contained operator, no `include` imports; settings inlined to avoid Airflow plugin loader path issues
+- `CelestiaOps/dags/test_ingest_exoplanets.py` — manual-trigger only (`schedule=None`), chain: `fetch_to_csv → log_stats`
+- Copied operator + DAG into main `airflow-stack/` (`plugins/operators/`, `dags/`) so the main Airflow instance picks them up
+- Airflow plugin path: import as `from operators.nasa_to_csv_operator import ...` (not `plugins.operators.*`) since Airflow adds `plugins/` itself to `sys.path`
+
+---
+
 ## 2026-05-13 — Search Engine: OpenSearch Replaced with PostgreSQL FTS
 
 **Decision:** Dropped OpenSearch entirely. Replaced with a GIN full-text search index on TimescaleDB. Deleted `dags/index_opensearch.py`.

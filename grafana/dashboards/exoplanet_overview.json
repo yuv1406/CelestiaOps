@@ -1,7 +1,7 @@
 {
   "title": "CelestiaOps — Exoplanet Observatory",
   "uid": "celestiaops-observatory",
-  "version": 3,
+  "version": 4,
   "schemaVersion": 38,
   "refresh": false,
   "tags": ["celestiaops", "astronomy"],
@@ -94,7 +94,7 @@
       "gridPos": { "x": 0, "y": 7, "w": 8, "h": 9 },
       "datasource": { "uid": "celestiaops-timescaledb" },
       "targets": [{
-        "rawSql": "SELECT CASE WHEN pl_rade < 1.5 THEN '🪨 Rocky (<1.5 R⊕)' WHEN pl_rade < 2.5 THEN '🌍 Super-Earth (1.5–2.5)' WHEN pl_rade < 4.0 THEN '🌫 Sub-Neptune (2.5–4)' WHEN pl_rade < 10.0 THEN '🔵 Neptune-like (4–10)' ELSE '🪐 Gas Giant (>10)' END AS \"Type\", COUNT(*) AS \"Count\" FROM exoplanets WHERE pl_rade IS NOT NULL GROUP BY 1 ORDER BY 2 DESC",
+        "rawSql": "SELECT COUNT(*) FILTER (WHERE pl_rade < 1.5) AS \"Rocky (<1.5 R⊕)\", COUNT(*) FILTER (WHERE pl_rade >= 1.5 AND pl_rade < 2.5) AS \"Super-Earth (1.5-2.5)\", COUNT(*) FILTER (WHERE pl_rade >= 2.5 AND pl_rade < 4.0) AS \"Sub-Neptune (2.5-4)\", COUNT(*) FILTER (WHERE pl_rade >= 4.0 AND pl_rade < 10.0) AS \"Neptune-like (4-10)\", COUNT(*) FILTER (WHERE pl_rade >= 10.0) AS \"Gas Giant (>10)\" FROM exoplanets WHERE pl_rade IS NOT NULL",
         "format": "table",
         "refId": "A"
       }],
@@ -109,7 +109,7 @@
       "gridPos": { "x": 8, "y": 7, "w": 8, "h": 9 },
       "datasource": { "uid": "celestiaops-timescaledb" },
       "targets": [{
-        "rawSql": "SELECT CASE WHEN st_teff < 3700 THEN 'M — Red Dwarf (<3700 K)' WHEN st_teff < 5200 THEN 'K — Orange (3700–5200 K)' WHEN st_teff < 6000 THEN 'G — Sun-like (5200–6000 K)' WHEN st_teff < 7500 THEN 'F — Yellow-White (6000–7500 K)' ELSE 'A+ — Hot (>7500 K)' END AS \"Spectral Type\", COUNT(*) AS \"Count\" FROM exoplanets WHERE st_teff IS NOT NULL GROUP BY 1 ORDER BY 2 DESC",
+        "rawSql": "SELECT COUNT(*) FILTER (WHERE st_teff < 3700) AS \"M — Red Dwarf (<3700 K)\", COUNT(*) FILTER (WHERE st_teff >= 3700 AND st_teff < 5200) AS \"K — Orange (3700-5200 K)\", COUNT(*) FILTER (WHERE st_teff >= 5200 AND st_teff < 6000) AS \"G — Sun-like (5200-6000 K)\", COUNT(*) FILTER (WHERE st_teff >= 6000 AND st_teff < 7500) AS \"F — Yellow-White (6000-7500 K)\", COUNT(*) FILTER (WHERE st_teff >= 7500) AS \"A+ — Hot (>7500 K)\" FROM exoplanets WHERE st_teff IS NOT NULL",
         "format": "table",
         "refId": "A"
       }],
@@ -123,7 +123,7 @@
       "gridPos": { "x": 16, "y": 7, "w": 8, "h": 9 },
       "datasource": { "uid": "celestiaops-timescaledb" },
       "targets": [{
-        "rawSql": "SELECT discoverymethod AS \"Method\", COUNT(*) AS \"Count\" FROM exoplanets WHERE discoverymethod IS NOT NULL GROUP BY 1 ORDER BY 2 DESC",
+        "rawSql": "SELECT COUNT(*) FILTER (WHERE discoverymethod = 'Transit') AS \"Transit\", COUNT(*) FILTER (WHERE discoverymethod = 'Radial Velocity') AS \"Radial Velocity\", COUNT(*) FILTER (WHERE discoverymethod = 'Microlensing') AS \"Microlensing\", COUNT(*) FILTER (WHERE discoverymethod = 'Imaging') AS \"Imaging\", COUNT(*) FILTER (WHERE discoverymethod = 'Transit Timing Variations') AS \"Transit Timing Variations\", COUNT(*) FILTER (WHERE discoverymethod NOT IN ('Transit','Radial Velocity','Microlensing','Imaging','Transit Timing Variations')) AS \"Other\" FROM exoplanets WHERE discoverymethod IS NOT NULL",
         "format": "table",
         "refId": "A"
       }],

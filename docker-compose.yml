@@ -1,0 +1,48 @@
+version: "3.8"
+
+# Joins the existing Airflow network so DAG tasks can reach these services
+# using container names as hostnames (e.g. celestiaops_timescaledb:5432)
+
+networks:
+  airflow-stack_default:
+    external: true
+
+services:
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: celestiaops_timescaledb
+    environment:
+      POSTGRES_USER: celestia
+      POSTGRES_PASSWORD: celestia
+      POSTGRES_DB: exoplanets
+    volumes:
+      - /data/celestiaops/timescaledb:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "celestia", "-d", "exoplanets"]
+      interval: 10s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - airflow-stack_default
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: celestiaops_grafana
+    user: "472:472"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: celestia
+    volumes:
+      - /data/celestiaops/grafana:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - airflow-stack_default

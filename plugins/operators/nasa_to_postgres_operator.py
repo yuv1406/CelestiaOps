@@ -11,6 +11,8 @@ from psycopg2.extras import execute_values
 
 from include.config.settings import (
     CHECKSUM_COLUMNS,
+    HZ_TEMP_MAX,
+    HZ_TEMP_MIN,
     NASA_COLUMNS,
     NASA_FETCH_CHUNK,
     NASA_TABLE,
@@ -86,6 +88,8 @@ class NasaToPostgresOperator(BaseOperator):
         prepared = []
         for row in raw_rows:
             checksum = _compute_checksum(row)
+            eqt = _coerce(row.get("pl_eqt"))
+            is_habitable = eqt is not None and HZ_TEMP_MIN <= eqt <= HZ_TEMP_MAX
             prepared.append((
                 row.get("pl_name"),
                 _coerce(row.get("hostname")),
@@ -97,7 +101,7 @@ class NasaToPostgresOperator(BaseOperator):
                 _coerce(row.get("pl_rade")),
                 _coerce(row.get("pl_masse")),
                 _coerce(row.get("pl_dens")),
-                _coerce(row.get("pl_eqt")),
+                eqt,
                 _coerce(row.get("pl_orbeccen")),
                 _coerce(row.get("pl_orbsmax")),
                 _coerce(row.get("pl_insol")),
@@ -111,6 +115,7 @@ class NasaToPostgresOperator(BaseOperator):
                 _coerce(row.get("ra")),
                 _coerce(row.get("dec")),
                 checksum,
+                is_habitable,
                 now,  # ingested_at
                 now,  # updated_at
             ))

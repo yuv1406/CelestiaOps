@@ -43,8 +43,6 @@ CHECKSUM_COLUMNS = [
 ]
 
 POSTGRES_CONN_ID = "celestiaops_postgres"
-OPENSEARCH_CONN_ID = "celestiaops_opensearch"
-OPENSEARCH_INDEX = "exoplanets"
 
 # Pagination chunk size for NASA API requests
 NASA_FETCH_CHUNK = 5000

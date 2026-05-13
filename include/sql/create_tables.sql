@@ -23,9 +23,10 @@ CREATE TABLE IF NOT EXISTS exoplanets (
     sy_vmag         DOUBLE PRECISION,
     ra              DOUBLE PRECISION,
     dec             DOUBLE PRECISION,
-    row_checksum    TEXT NOT NULL,
-    ingested_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    row_checksum             TEXT NOT NULL,
+    is_potentially_habitable BOOLEAN NOT NULL DEFAULT FALSE,
+    ingested_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at               TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Sync state table — tracks the last successful run per DAG
@@ -63,8 +64,18 @@ SELECT create_hypertable(
 );
 
 -- Index for common query patterns
-CREATE INDEX IF NOT EXISTS idx_exoplanets_disc_year     ON exoplanets (disc_year);
-CREATE INDEX IF NOT EXISTS idx_exoplanets_discoverymethod ON exoplanets (discoverymethod);
-CREATE INDEX IF NOT EXISTS idx_exoplanets_pl_eqt        ON exoplanets (pl_eqt);
-CREATE INDEX IF NOT EXISTS idx_exoplanets_updated_at    ON exoplanets (updated_at DESC);
-CREATE INDEX IF NOT EXISTS idx_history_pl_name          ON exoplanets_history (pl_name, snapshot_time DESC);
+CREATE INDEX IF NOT EXISTS idx_exoplanets_disc_year        ON exoplanets (disc_year);
+CREATE INDEX IF NOT EXISTS idx_exoplanets_discoverymethod  ON exoplanets (discoverymethod);
+CREATE INDEX IF NOT EXISTS idx_exoplanets_pl_eqt           ON exoplanets (pl_eqt);
+CREATE INDEX IF NOT EXISTS idx_exoplanets_updated_at       ON exoplanets (updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_exoplanets_habitable        ON exoplanets (is_potentially_habitable) WHERE is_potentially_habitable = TRUE;
+CREATE INDEX IF NOT EXISTS idx_history_pl_name             ON exoplanets_history (pl_name, snapshot_time DESC);
+
+-- GIN index for full-text search across planet name, host star, and discovery method
+CREATE INDEX IF NOT EXISTS idx_exoplanets_fts ON exoplanets USING GIN (
+    to_tsvector('english',
+        coalesce(pl_name, '') || ' ' ||
+        coalesce(hostname, '') || ' ' ||
+        coalesce(discoverymethod, '')
+    )
+);

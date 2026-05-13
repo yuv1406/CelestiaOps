@@ -270,22 +270,18 @@
 
     {
       "id": 16,
-      "type": "xychart",
-      "title": "Planet Radius vs Mass — Size Classification Map",
-      "description": "Earth = (1, 1). Neptune ≈ (3.9, 17). Saturn ≈ (9.4, 95). Jupiter ≈ (11.2, 318). Filter: radius < 20 R⊕, mass < 500 M⊕",
+      "type": "barchart",
+      "title": "Planet Count by Size Class (Radius Bins)",
+      "description": "Rocky < 1.5 R⊕ | Super-Earth 1.5–2.5 | Sub-Neptune 2.5–4 | Neptune-like 4–10 | Gas Giant > 10. Earth = 1 R⊕, Neptune = 3.9 R⊕, Jupiter = 11.2 R⊕",
       "gridPos": { "x": 0, "y": 47, "w": 14, "h": 10 },
       "datasource": { "uid": "celestiaops-timescaledb" },
       "targets": [{
-        "rawSql": "SELECT ROUND(pl_rade::numeric, 3) AS \"Radius (R⊕)\", ROUND(pl_masse::numeric, 3) AS \"Mass (M⊕)\", CASE WHEN pl_rade < 1.5 THEN 'Rocky' WHEN pl_rade < 2.5 THEN 'Super-Earth' WHEN pl_rade < 4.0 THEN 'Sub-Neptune' WHEN pl_rade < 10.0 THEN 'Neptune-like' ELSE 'Gas Giant' END AS \"Type\" FROM exoplanets WHERE pl_rade IS NOT NULL AND pl_masse IS NOT NULL AND pl_rade < 20 AND pl_masse < 500 ORDER BY pl_rade",
+        "rawSql": "SELECT CASE WHEN pl_rade < 1.5 THEN '1. Rocky\\n<1.5 R⊕' WHEN pl_rade < 2.5 THEN '2. Super-Earth\\n1.5–2.5 R⊕' WHEN pl_rade < 4.0 THEN '3. Sub-Neptune\\n2.5–4 R⊕' WHEN pl_rade < 10.0 THEN '4. Neptune-like\\n4–10 R⊕' ELSE '5. Gas Giant\\n>10 R⊕' END AS \"Class\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE pl_rade IS NOT NULL GROUP BY 1 ORDER BY 1",
         "format": "table",
         "refId": "A"
       }],
-      "options": {
-        "seriesMapping": {
-          "0": { "x": "Radius (R\u2295)", "y": "Mass (M\u2295)" }
-        },
-        "tooltip": { "mode": "single" }
-      }
+      "options": { "xField": "Class", "barWidthFactor": 0.8, "tooltip": { "mode": "single" } },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" } } }
     },
 
     {
@@ -316,37 +312,37 @@
 
     {
       "id": 18,
-      "type": "histogram",
+      "type": "barchart",
       "title": "Orbital Period Distribution (days < 1000)",
       "description": "Earth = 365.25 days. Most close-in transiting planets have periods < 10 days.",
       "gridPos": { "x": 0, "y": 57, "w": 8, "h": 8 },
       "datasource": { "uid": "celestiaops-timescaledb" },
-      "targets": [{ "rawSql": "SELECT pl_orbper AS \"Orbital Period (days)\" FROM exoplanets WHERE pl_orbper IS NOT NULL AND pl_orbper BETWEEN 0.1 AND 1000", "format": "table", "refId": "A" }],
-      "options": { "bucketSize": "auto", "fillOpacity": 70 },
+      "targets": [{ "rawSql": "SELECT CASE WHEN pl_orbper < 2 THEN '0–2d (Hot)' WHEN pl_orbper < 10 THEN '2–10d' WHEN pl_orbper < 30 THEN '10–30d' WHEN pl_orbper < 100 THEN '30–100d' WHEN pl_orbper < 200 THEN '100–200d' WHEN pl_orbper < 365 THEN '200–365d' WHEN pl_orbper < 500 THEN '365–500d (Earth-like)' ELSE '500–1000d' END AS \"Period Range\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE pl_orbper BETWEEN 0.1 AND 1000 GROUP BY 1 ORDER BY MIN(pl_orbper)", "format": "table", "refId": "A" }],
+      "options": { "xField": "Period Range", "barWidthFactor": 0.8, "tooltip": { "mode": "single" } },
       "fieldConfig": { "defaults": { "color": { "fixedColor": "blue", "mode": "fixed" } } }
     },
 
     {
       "id": 19,
-      "type": "histogram",
+      "type": "barchart",
       "title": "Equilibrium Temperature Distribution",
       "description": "Green band = habitable zone (180–310 K). Earth effective temp ≈ 255 K.",
       "gridPos": { "x": 8, "y": 57, "w": 8, "h": 8 },
       "datasource": { "uid": "celestiaops-timescaledb" },
-      "targets": [{ "rawSql": "SELECT pl_eqt AS \"Eq. Temperature (K)\" FROM exoplanets WHERE pl_eqt IS NOT NULL AND pl_eqt BETWEEN 100 AND 4500", "format": "table", "refId": "A" }],
-      "options": { "bucketSize": "auto", "fillOpacity": 70 },
-      "fieldConfig": { "defaults": { "color": { "fixedColor": "orange", "mode": "fixed" } } }
+      "targets": [{ "rawSql": "SELECT CASE WHEN pl_eqt < 180 THEN '<180K (Frozen)' WHEN pl_eqt < 310 THEN '180–310K (HZ ✓)' WHEN pl_eqt < 500 THEN '310–500K (Hot)' WHEN pl_eqt < 1000 THEN '500–1000K (Very Hot)' WHEN pl_eqt < 2000 THEN '1000–2000K (Lava)' ELSE '>2000K (Ultra-Hot)' END AS \"Temp Range\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE pl_eqt IS NOT NULL GROUP BY 1 ORDER BY MIN(pl_eqt)", "format": "table", "refId": "A" }],
+      "options": { "xField": "Temp Range", "barWidthFactor": 0.8, "tooltip": { "mode": "single" } },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" } } }
     },
 
     {
       "id": 20,
-      "type": "histogram",
+      "type": "barchart",
       "title": "Distance Distribution (parsecs < 3000)",
       "description": "1 parsec = 3.26 light-years. Kepler field ≈ 300–3000 pc.",
       "gridPos": { "x": 16, "y": 57, "w": 8, "h": 8 },
       "datasource": { "uid": "celestiaops-timescaledb" },
-      "targets": [{ "rawSql": "SELECT sy_dist AS \"Distance (parsecs)\" FROM exoplanets WHERE sy_dist IS NOT NULL AND sy_dist < 3000", "format": "table", "refId": "A" }],
-      "options": { "bucketSize": "auto", "fillOpacity": 70 },
+      "targets": [{ "rawSql": "SELECT CASE WHEN sy_dist < 10 THEN '<10 pc (33 ly)' WHEN sy_dist < 50 THEN '10–50 pc' WHEN sy_dist < 100 THEN '50–100 pc' WHEN sy_dist < 300 THEN '100–300 pc' WHEN sy_dist < 500 THEN '300–500 pc' WHEN sy_dist < 1000 THEN '500–1000 pc' WHEN sy_dist < 2000 THEN '1000–2000 pc' ELSE '2000–3000 pc' END AS \"Distance Range\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE sy_dist IS NOT NULL AND sy_dist < 3000 GROUP BY 1 ORDER BY MIN(sy_dist)", "format": "table", "refId": "A" }],
+      "options": { "xField": "Distance Range", "barWidthFactor": 0.8, "tooltip": { "mode": "single" } },
       "fieldConfig": { "defaults": { "color": { "fixedColor": "purple", "mode": "fixed" } } }
     },
 

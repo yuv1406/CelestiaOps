@@ -1,0 +1,145 @@
+{
+  "title": "CelestiaOps — Exoplanet Overview",
+  "uid": "celestiaops-overview",
+  "version": 1,
+  "schemaVersion": 38,
+  "refresh": "1h",
+  "tags": ["celestiaops"],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total Exoplanets",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT COUNT(*) AS value FROM exoplanets",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": { "colorMode": "background", "graphMode": "none" },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "blue", "mode": "fixed" } } }
+    },
+    {
+      "id": 2,
+      "title": "Potentially Habitable",
+      "type": "stat",
+      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT COUNT(*) AS value FROM exoplanets WHERE is_potentially_habitable = true",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": { "colorMode": "background", "graphMode": "none" },
+      "fieldConfig": { "defaults": { "color": { "fixedColor": "green", "mode": "fixed" } } }
+    },
+    {
+      "id": 3,
+      "title": "Last Sync",
+      "type": "stat",
+      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT last_sync_at AS value FROM sync_state WHERE dag_id = 'ingest_exoplanets'",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": { "colorMode": "none", "graphMode": "none" },
+      "fieldConfig": { "defaults": { "unit": "dateTimeAsIso" } }
+    },
+    {
+      "id": 4,
+      "title": "Discoveries by Year",
+      "type": "barchart",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT disc_year AS year, COUNT(*) AS discoveries FROM exoplanets WHERE disc_year IS NOT NULL GROUP BY disc_year ORDER BY disc_year",
+        "format": "table",
+        "refId": "A"
+      }],
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" } },
+        "overrides": [{ "matcher": { "id": "byName", "options": "year" }, "properties": [{ "id": "custom.axisLabel", "value": "Year" }] }]
+      },
+      "options": { "xField": "year" }
+    },
+    {
+      "id": 5,
+      "title": "Discovery Methods",
+      "type": "piechart",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT discoverymethod AS method, COUNT(*) AS count FROM exoplanets WHERE discoverymethod IS NOT NULL GROUP BY discoverymethod ORDER BY count DESC",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": { "pieType": "donut", "displayLabels": ["name", "percent"] }
+    },
+    {
+      "id": 6,
+      "title": "Planet Radius vs Mass",
+      "type": "scatter",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT pl_rade AS radius_earth, pl_masse AS mass_earth, is_potentially_habitable FROM exoplanets WHERE pl_rade IS NOT NULL AND pl_masse IS NOT NULL AND pl_rade < 20 AND pl_masse < 1000",
+        "format": "table",
+        "refId": "A"
+      }],
+      "fieldConfig": {
+        "defaults": { "custom": { "pointSize": { "fixed": 4 } } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "radius_earth" }, "properties": [{ "id": "custom.axisLabel", "value": "Radius (Earth radii)" }] },
+          { "matcher": { "id": "byName", "options": "mass_earth" }, "properties": [{ "id": "custom.axisLabel", "value": "Mass (Earth masses)" }] }
+        ]
+      },
+      "options": { "xField": "radius_earth", "yField": "mass_earth" }
+    },
+    {
+      "id": 7,
+      "title": "Equilibrium Temperature Distribution",
+      "type": "histogram",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT pl_eqt AS temperature_k FROM exoplanets WHERE pl_eqt IS NOT NULL AND pl_eqt BETWEEN 100 AND 3000",
+        "format": "table",
+        "refId": "A"
+      }],
+      "fieldConfig": { "defaults": { "unit": "celsius", "custom": { "fillOpacity": 80 } } },
+      "options": { "bucketSize": "auto", "fillOpacity": 80 }
+    },
+    {
+      "id": 8,
+      "title": "Distance Distribution (parsecs)",
+      "type": "histogram",
+      "gridPos": { "x": 0, "y": 20, "w": 12, "h": 8 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT sy_dist AS distance_pc FROM exoplanets WHERE sy_dist IS NOT NULL AND sy_dist < 3000",
+        "format": "table",
+        "refId": "A"
+      }],
+      "fieldConfig": { "defaults": { "unit": "pc", "custom": { "fillOpacity": 80 } } },
+      "options": { "bucketSize": "auto", "fillOpacity": 80 }
+    },
+    {
+      "id": 9,
+      "title": "Multi-Planet Systems",
+      "type": "barchart",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+      "datasource": { "uid": "celestiaops-timescaledb" },
+      "targets": [{
+        "rawSql": "SELECT sy_pnum AS planets_in_system, COUNT(DISTINCT hostname) AS star_systems FROM exoplanets WHERE sy_pnum IS NOT NULL GROUP BY sy_pnum ORDER BY sy_pnum",
+        "format": "table",
+        "refId": "A"
+      }],
+      "options": { "xField": "planets_in_system" }
+    }
+  ],
+  "time": { "from": "now-1y", "to": "now" },
+  "timepicker": {}
+}

@@ -916,9 +916,6 @@
         "barWidthFactor": 0.8,
         "tooltip": {
           "mode": "single"
-        },
-        "legend": {
-          "displayMode": "hidden"
         }
       },
       "fieldConfig": {

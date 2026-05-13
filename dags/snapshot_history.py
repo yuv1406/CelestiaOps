@@ -11,12 +11,14 @@ Task chain:
   check_data_freshness → create_snapshot → prune_old_snapshots
 """
 
+import sys
 from datetime import datetime, timedelta, timezone
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 
+sys.path.insert(0, "/opt/airflow")
 from include.config.settings import POSTGRES_CONN_ID
 
 DEFAULT_ARGS = {
@@ -41,6 +43,8 @@ def check_data_freshness(**context):
         raise ValueError("No sync_state record found for ingest_exoplanets — run ingest first")
 
     last_sync = result[0]
+    if last_sync.tzinfo is None:
+        last_sync = last_sync.replace(tzinfo=timezone.utc)
     age = datetime.now(timezone.utc) - last_sync
     if age > timedelta(hours=36):
         raise ValueError(

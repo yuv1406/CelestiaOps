@@ -1,7 +1,7 @@
 {
   "title": "CelestiaOps — Exoplanet Observatory",
   "uid": "celestiaops-observatory",
-  "version": 5,
+  "version": 6,
   "schemaVersion": 38,
   "refresh": false,
   "tags": [
@@ -909,24 +909,117 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT CASE WHEN pl_eqt < 180 THEN '<180K (Frozen)' WHEN pl_eqt < 310 THEN '180–310K (HZ ✓)' WHEN pl_eqt < 500 THEN '310–500K (Hot)' WHEN pl_eqt < 1000 THEN '500–1000K (Very Hot)' WHEN pl_eqt < 2000 THEN '1000–2000K (Lava)' ELSE '>2000K (Ultra-Hot)' END AS \"Temp Range\", COUNT(*) AS \"Planets\" FROM exoplanets WHERE pl_eqt IS NOT NULL GROUP BY 1 ORDER BY MIN(pl_eqt)",
+          "rawSql": "SELECT COUNT(*) FILTER (WHERE pl_eqt < 180) AS \"<180K (Frozen)\", COUNT(*) FILTER (WHERE pl_eqt >= 180 AND pl_eqt < 310) AS \"180-310K (HZ)\", COUNT(*) FILTER (WHERE pl_eqt >= 310 AND pl_eqt < 500) AS \"310-500K (Hot)\", COUNT(*) FILTER (WHERE pl_eqt >= 500 AND pl_eqt < 1000) AS \"500-1000K (Very Hot)\", COUNT(*) FILTER (WHERE pl_eqt >= 1000 AND pl_eqt < 2000) AS \"1000-2000K (Lava)\", COUNT(*) FILTER (WHERE pl_eqt >= 2000) AS \">2000K (Ultra-Hot)\" FROM exoplanets WHERE pl_eqt IS NOT NULL",
           "format": "table",
           "refId": "A"
         }
       ],
       "options": {
-        "xField": "Temp Range",
         "barWidthFactor": 0.8,
         "tooltip": {
           "mode": "single"
-        }
+        },
+        "xField": "field"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "fixed",
+            "fixedColor": "blue"
           }
-        }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "<180K (Frozen)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "light-blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "180-310K (HZ)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "310-500K (Hot)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "yellow"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "500-1000K (Very Hot)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "1000-2000K (Lava)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": ">2000K (Ultra-Hot)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "dark-red"
+                }
+              }
+            ]
+          }
+        ]
       }
     },
     {

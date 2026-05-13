@@ -26,7 +26,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "#CelestiaOps Exoplanet Observatory\nReal-time catalog of **confirmed exoplanets** sourced from the NASA Exoplanet Archive (TAP). Data ingested daily at 02:00 UTC. Earth baseline: radius = 1 R⊕, mass = 1 M⊕, orbital period = 365.25 days, equilibrium temperature ≈ 255 K (effective) / 288 K (surface). Habitable zone defined as equilibrium temperature 180 – 310 K."
+        "content": "CelestiaOps Exoplanet Observatory\nReal-time catalog of **confirmed exoplanets** sourced from the NASA Exoplanet Archive (TAP). Data ingested daily at 02:00 UTC. Earth baseline: radius = 1 R⊕, mass = 1 M⊕, orbital period = 365.25 days, equilibrium temperature ≈ 255 K (effective) / 288 K (surface). Habitable zone defined as equilibrium temperature 180 – 310 K."
       }
     },
     {

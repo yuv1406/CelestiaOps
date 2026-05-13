@@ -1,0 +1,34 @@
+```txt
+CelestiaOps is a self-hosted, production-grade exoplanet intelligence pipeline built using Apache Airflow, TimescaleDB, OpenSearch, and Grafana.
+
+The system periodically ingests astrophysical datasets from NASA’s Exoplanet Archive API https://exoplanetarchive.ipac.caltech.edu/TAP/sync , processes and transforms planetary metadata, performs incremental synchronization using hash-based change detection, and stores historical snapshots for temporal analysis.
+
+Designed with scalability and efficiency in mind, CelestiaOps avoids unnecessary database writes and expensive full-table comparisons by implementing state-aware ingestion workflows and optimized indexing strategies.
+
+The platform enables querying and visualization of:
+- Newly discovered exoplanets
+- Atmospheric and stellar characteristics
+- Planetary mass, radius, and orbital patterns
+- Historical discovery trends over time
+- Potentially habitable exoplanets
+
+Core Features:
+- Automated ETL orchestration using Apache Airflow
+- Incremental sync engine with checksum-based diffing
+- Historical time-series storage using TimescaleDB
+- High-speed indexing and search with OpenSearch
+- Grafana dashboards for observability and analytics
+- Fully open-source and self-hostable architecture
+- Containerized deployment using Docker Compose
+
+Tech Stack:
+- Apache Airflow
+- Python
+- TimescaleDB / PostgreSQL
+- OpenSearch
+- Grafana
+- Docker
+- NASA Exoplanet Archive API
+
+CelestiaOps combines DevOps engineering, distributed data processing, and astrophysical data analytics into a scalable backend-focused platform engineered for efficient large-scale ingestion pipelines.
+```

@@ -84,3 +84,47 @@ Directories: `/data/celestiaops/{timescaledb,opensearch,grafana}`
 - 02:00 — `ingest_exoplanets` (daily, unchanged)
 - 05:00 — `ingest_lamost_stars` (weekly)
 - 08:00 — `snapshot_history` (both branches)
+
+---
+
+## 2026-05-17 — LAMOST Grafana Dashboard Added
+
+**Decision:** Created `lamost_spectroscopy.json` — a 24-panel Grafana dashboard
+for LAMOST spectroscopic data, with an exoplanet context section sourced from
+the NASA catalog.
+
+**Why:** The LAMOST pipeline had been ingesting data since earlier today but had
+no visualisation layer. The exoplanet overview dashboard covers the NASA catalog;
+a dedicated LAMOST dashboard exposes stellar parameters (Teff, log g, [Fe/H],
+HRV), spectral classification, data quality (SNR), and the subset of exoplanet
+hosts observable by LAMOST.
+
+**What changed:**
+- `grafana/provisioning/datasources/timescaledb.yaml` — added second datasource
+  `CelestiaOps LAMOST` (uid: `celestiaops-lamost`) pointing to the `lamost` DB.
+  Same host/credentials as the existing `CelestiaOps` datasource, different
+  `jsonData.database`.
+- `grafana/dashboards/lamost_spectroscopy.json` — new dashboard (uid:
+  `celestiaops-lamost`), 24 panels across five sections:
+  1. LAMOST stats (6 stat cards: observations, host stars, mean Teff, mean [Fe/H], avg SNR, SNR > 20 count)
+  2. Spectral classification (class donut, subclass bar, Teff-by-type bar)
+  3. Parameter distributions (metallicity, log g, radial velocity — all bar charts)
+  4. Best observations table (top 50 by SNR, colour-coded SNR column, filterable)
+  5. Exoplanet context (6 stats + discovery methods donut + planet size donut + LAMOST-range hosts table from NASA catalog)
+
+**Incident — datasource not applying on file reload:**
+After adding the second datasource entry to `timescaledb.yaml`, Grafana
+provisioned the `celestiaops-lamost` UID (queries reached the server) but all
+panels returned `relation "lamost_observations" does not exist` — meaning
+Grafana was connecting to the `exoplanets` database rather than `lamost`. Root
+cause: Grafana's file-based datasource provisioning hot-reloads *updates* to
+existing entries but does not register *new* datasource entries without a
+restart. Fix: `docker restart celestiaops_grafana`. Post-restart logs confirmed
+`inserting datasource from configuration name="CelestiaOps LAMOST"`.
+
+**Dashboard design decision — no cross-database joins:**
+The LAMOST and exoplanet panels use independent datasources rather than
+cross-database SQL. PostgreSQL requires `dblink` or FDW for cross-database
+queries; both add complexity for no meaningful gain here. The `hostname` column
+links the datasets conceptually — the exoplanet context panels in the dashboard
+provide that link visually without a live JOIN.

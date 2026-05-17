@@ -18,3 +18,21 @@ datasources:
       timescaledb: true
     isDefault: true
     editable: false
+
+  - name: CelestiaOps LAMOST
+    type: postgres
+    uid: celestiaops-lamost
+    url: celestiaops_timescaledb:5432
+    user: celestia
+    secureJsonData:
+      password: celestia
+    jsonData:
+      database: lamost
+      sslmode: disable
+      maxOpenConns: 10
+      maxIdleConns: 5
+      connMaxLifetime: 14400
+      postgresVersion: 1600
+      timescaledb: true
+    isDefault: false
+    editable: false

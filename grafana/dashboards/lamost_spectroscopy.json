@@ -1,0 +1,1804 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "liveNow": false,
+  "panels": [
+    {
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "## CelestiaOps \u2014 LAMOST Stellar Spectroscopy\nSpectroscopic parameters for exoplanet host stars observed by the **LAMOST** (Large Sky Area Multi-Object Fiber Spectroscopic Telescope) DR5 survey. Data sourced from VizieR TAP (V/164/stellar5), cone-searched within 5 arcsec of each NASA exoplanet host star. LAMOST coverage: FGK stars in the northern sky (dec > \u221210\u00b0), V \u224810\u201317.8 mag. **Exoplanet context** panels at the bottom draw from the full NASA Exoplanet Archive for cross-reference.",
+        "mode": "markdown"
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [],
+      "title": "",
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-lamost"
+      },
+      "description": "Total number of LAMOST spectroscopic observations matched to NASA exoplanet host stars. Each host star may have up to 5 observations ranked by g-band SNR.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "purple",
+            "mode": "fixed"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 3
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-lamost"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS value FROM lamost_observations",
+          "refId": "A"
+        }
+      ],
+      "title": "LAMOST Observations",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-lamost"
+      },
+      "description": "Number of distinct exoplanet host stars with at least one LAMOST spectroscopic match.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 3
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-lamost"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(DISTINCT hostname) AS value FROM lamost_observations WHERE hostname IS NOT NULL",
+          "refId": "A"
+        }
+      ],
+      "title": "Host Stars Covered",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-lamost"
+      },
+      "description": "Mean effective temperature of LAMOST-observed host stars derived from low-resolution spectral fitting. The Sun has Teff \u2248 5,778 K.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "orange",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 3
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-lamost"
+          },
+          "format": "table",
+          "rawSql": "SELECT ROUND(AVG(teff)::numeric, 0) AS value FROM lamost_observations WHERE teff IS NOT NULL",
+          "refId": "A"
+        }
+      ],
+      "title": "Mean Teff (K)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-lamost"
+      },
+      "description": "Mean metallicity [Fe/H] of observed host stars. Negative = metal-poor; positive = metal-rich. Solar metallicity = 0.000 dex. Metal-rich stars preferentially host gas giants (planet-metallicity correlation).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "green",
+            "mode": "fixed"
+          },
+          "decimals": 3,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 3
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-lamost"
+          },
+          "format": "table",
+          "rawSql": "SELECT ROUND(AVG(feh)::numeric, 3) AS value FROM lamost_observations WHERE feh IS NOT NULL",
+          "refId": "A"
+        }
+      ],
+      "title": "Mean [Fe/H] (dex)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-lamost"
+      },
+      "description": "Average signal-to-noise ratio per pixel in the SDSS g-band (~4000\u20135500 \u00c5). SNR > 10 is the typical minimum for reliable stellar parameter derivation from LAMOST LRS spectra.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "yellow",
+            "mode": "fixed"
+          },
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 3
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-lamost"
+          },
+          "format": "table",
+          "rawSql": "SELECT ROUND(AVG(snr_g)::numeric, 1) AS value FROM lamost_observations WHERE snr_g IS NOT NULL",
+          "refId": "A"
+        }
+      ],
+      "title": "Avg SNR g-band",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-lamost"
+      },
+      "description": "Observations with g-band SNR > 20, indicating high-confidence stellar parameter measurements suitable for precise characterisation of exoplanet host stars.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "semi-dark-green",
+            "mode": "fixed"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 3
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-lamost"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS value FROM lamost_observations WHERE snr_g > 20",
+          "refId": "A"
+        }
+      ],
+      "title": "High-Quality Spectra (SNR > 20)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-lamost"
+      },
+      "description": "LAMOST pipeline classification of each observed spectrum. STAR encompasses all stellar spectra. GALAXY and QSO indicate non-stellar matches, which may occur due to blending or mis-targeting. UNKNOWN are spectra the pipeline could not classify.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 7
+      },
+      "id": 8,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-lamost"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) FILTER (WHERE spec_class = 'STAR') AS \"Star\", COUNT(*) FILTER (WHERE spec_class = 'GALAXY') AS \"Galaxy\", COUNT(*) FILTER (WHERE spec_class = 'QSO') AS \"QSO\", COUNT(*) FILTER (WHERE spec_class = 'UNKNOWN' OR spec_class IS NULL) AS \"Unknown\" FROM lamost_observations",
+          "refId": "A"
+        }
+      ],
+      "title": "Spectral Class Distribution",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-lamost"
+      },
+      "description": "Top 15 most frequent spectral subclasses from LAMOST stellar spectra (e.g. G2, K5, F9). Filtered to stellar spectra with a non-empty subclass only.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 8,
+        "y": 7
+      },
+      "id": 9,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "barWidthFactor": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Subclass",
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-lamost"
+          },
+          "format": "table",
+          "rawSql": "SELECT spec_subclass AS \"Subclass\", COUNT(*) AS \"Observations\" FROM lamost_observations WHERE spec_subclass IS NOT NULL AND spec_subclass != '' AND spec_class = 'STAR' GROUP BY spec_subclass ORDER BY COUNT(*) DESC LIMIT 15",
+          "refId": "A"
+        }
+      ],
+      "title": "Top 15 Spectral Subclasses",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-lamost"
+      },
+      "description": "Distribution of host star effective temperatures from LAMOST spectral fits, grouped by spectral class. The bulk of LAMOST exoplanet host targets are FGK dwarfs in the 4000\u20137000 K range.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 7
+      },
+      "id": 10,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "barWidthFactor": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Spectral Type",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-lamost"
+          },
+          "format": "table",
+          "rawSql": "SELECT CASE WHEN teff < 3700 THEN '1. M (<3700 K)' WHEN teff < 5200 THEN '2. K (3700-5200 K)' WHEN teff < 6000 THEN '3. G (5200-6000 K)' WHEN teff < 7500 THEN '4. F (6000-7500 K)' ELSE '5. A+ (>7500 K)' END AS \"Spectral Type\", COUNT(*) AS \"Observations\" FROM lamost_observations WHERE teff IS NOT NULL GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Teff Distribution by Spectral Type",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-lamost"
+      },
+      "description": "Metallicity distribution of LAMOST-observed host stars. Metal-rich stars ([Fe/H] > 0) are statistically more likely to host gas giants \u2014 the planet-metallicity correlation. Sub-solar metallicity is typical of older Galactic disk stars.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 16
+      },
+      "id": 11,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "barWidthFactor": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Metallicity",
+        "xTickLabelRotation": -30,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-lamost"
+          },
+          "format": "table",
+          "rawSql": "SELECT CASE WHEN feh < -1.0 THEN '1. < -1.0 (Metal-poor)' WHEN feh < -0.5 THEN '2. -1.0 to -0.5' WHEN feh < 0.0 THEN '3. -0.5 to 0.0' WHEN feh < 0.5 THEN '4. 0.0 to +0.5' ELSE '5. > +0.5 (Metal-rich)' END AS \"Metallicity\", COUNT(*) AS \"Observations\" FROM lamost_observations WHERE feh IS NOT NULL GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "[Fe/H] Metallicity Distribution",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-lamost"
+      },
+      "description": "Surface gravity (log g) distribution. Main-sequence dwarfs cluster at log g \u22484.0\u20134.5 (Sun: log g = 4.44 cgs). Subgiants fall near 3.0\u20134.0; evolved giants have log g < 3.0. Compact objects would appear above 5.0.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 16
+      },
+      "id": 12,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "barWidthFactor": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "log g bin",
+        "xTickLabelRotation": -30,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-lamost"
+          },
+          "format": "table",
+          "rawSql": "SELECT CASE WHEN logg < 2.0 THEN '1. < 2.0 (Giant)' WHEN logg < 3.0 THEN '2. 2.0-3.0 (Subgiant)' WHEN logg < 4.0 THEN '3. 3.0-4.0 (Evolved)' WHEN logg < 5.0 THEN '4. 4.0-5.0 (Main Seq)' ELSE '5. > 5.0 (Compact)' END AS \"log g bin\", COUNT(*) AS \"Observations\" FROM lamost_observations WHERE logg IS NOT NULL GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Surface Gravity (log g) Distribution",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-lamost"
+      },
+      "description": "Heliocentric radial velocity (HRV) distribution. The spread reflects Milky Way disk kinematics. Stars near 0 km/s co-move with the Sun; large |HRV| values may indicate thick disk or halo membership, or unresolved binaries.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 16
+      },
+      "id": 13,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "barWidthFactor": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "HRV Range",
+        "xTickLabelRotation": -30,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-lamost"
+          },
+          "format": "table",
+          "rawSql": "SELECT CASE WHEN hrv < -100 THEN '1. < -100 km/s' WHEN hrv < -50 THEN '2. -100 to -50' WHEN hrv < 0 THEN '3. -50 to 0' WHEN hrv < 50 THEN '4. 0 to +50' WHEN hrv < 100 THEN '5. +50 to +100' ELSE '6. > +100 km/s' END AS \"HRV Range\", COUNT(*) AS \"Observations\" FROM lamost_observations WHERE hrv IS NOT NULL GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Heliocentric Radial Velocity Distribution",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-lamost"
+      },
+      "description": "Top 50 LAMOST observations ranked by g-band SNR. All columns are sortable and filterable. Teff, log g, and [Fe/H] are LAMOST spectroscopic measurements; HRV is the heliocentric radial velocity in km/s.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SNR g"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 80
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "semi-dark-red",
+                      "value": null
+                    },
+                    {
+                      "color": "semi-dark-orange",
+                      "value": 10
+                    },
+                    {
+                      "color": "semi-dark-green",
+                      "value": 20
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Host Star"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 160
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Teff (K)"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 14,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "SNR g"
+          }
+        ]
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-lamost"
+          },
+          "format": "table",
+          "rawSql": "SELECT hostname AS \"Host Star\", COALESCE(spec_subclass, '?') AS \"Subclass\", ROUND(teff::numeric, 0) AS \"Teff (K)\", ROUND(e_teff::numeric, 0) AS \"\u00b1Teff\", ROUND(logg::numeric, 2) AS \"log g\", ROUND(e_logg::numeric, 2) AS \"\u00b1log g\", ROUND(feh::numeric, 3) AS \"[Fe/H]\", ROUND(hrv::numeric, 1) AS \"HRV (km/s)\", ROUND(snr_g::numeric, 1) AS \"SNR g\", ROUND(snr_r::numeric, 1) AS \"SNR r\", obs_date AS \"Obs Date\", obsid AS \"ObsID\" FROM lamost_observations WHERE snr_g IS NOT NULL ORDER BY snr_g DESC LIMIT 50",
+          "refId": "A"
+        }
+      ],
+      "title": "Best LAMOST Observations (by SNR)",
+      "type": "table"
+    },
+    {
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 33
+      },
+      "id": 15,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "### Exoplanet Catalog Context\nThe panels below draw from the full **NASA Exoplanet Archive** (sourced daily via TAP). The final table shows confirmed exoplanets whose host stars fall within LAMOST\u2019s observable range (V mag 10\u201317.8, dec > \u221210\u00b0) \u2014 stars where cross-matching with LAMOST DR5 may be possible.",
+        "mode": "markdown"
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [],
+      "title": "",
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Total confirmed exoplanets in the NASA Exoplanet Archive as of the last daily ingest.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 35
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS value FROM exoplanets",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Confirmed Exoplanets",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Planets with equilibrium temperature 180\u2013310 K, placing them in the conservative habitable zone.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "green",
+            "mode": "fixed"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 35
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS value FROM exoplanets WHERE is_potentially_habitable = true",
+          "refId": "A"
+        }
+      ],
+      "title": "Habitable Zone Candidates",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Host stars with Teff 5200\u20136000 K, the G spectral class (same as our Sun at 5,778 K).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "yellow",
+            "mode": "fixed"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 35
+      },
+      "id": 18,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(DISTINCT hostname) AS value FROM exoplanets WHERE st_teff BETWEEN 5200 AND 6000",
+          "refId": "A"
+        }
+      ],
+      "title": "Sun-like Host Stars (G-type)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Host systems with two or more confirmed planets, indicating dynamically stable multi-body architectures.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "purple",
+            "mode": "fixed"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 35
+      },
+      "id": 19,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(DISTINCT hostname) AS value FROM exoplanets WHERE sy_pnum >= 2",
+          "refId": "A"
+        }
+      ],
+      "title": "Multi-Planet Systems",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Distance to the nearest confirmed exoplanet host in light-years (1 pc = 3.26 ly).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-blue",
+            "mode": "fixed"
+          },
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 35
+      },
+      "id": 20,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT ROUND((MIN(sy_dist) * 3.26156)::numeric, 2) AS value FROM exoplanets",
+          "refId": "A"
+        }
+      ],
+      "title": "Nearest Exoplanet (ly)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Confirmed exoplanets whose host star falls within LAMOST\u2019s observable magnitude window (V mag 10\u201317.8) and northern sky footprint (dec > \u221210\u00b0), making spectroscopic cross-matching with LAMOST DR5 feasible.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "semi-dark-purple",
+            "mode": "fixed"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 35
+      },
+      "id": 21,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS value FROM exoplanets WHERE sy_vmag BETWEEN 10 AND 17.8 AND dec > -10",
+          "refId": "A"
+        }
+      ],
+      "title": "Planets in LAMOST Range",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Detection method breakdown across the full NASA exoplanet catalog. Transit dominates due to Kepler and TESS. The LAMOST-observable subset is skewed toward Radial Velocity targets, which tend to be brighter host stars.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 0,
+        "y": 39
+      },
+      "id": 22,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) FILTER (WHERE discoverymethod = 'Transit') AS \"Transit\", COUNT(*) FILTER (WHERE discoverymethod = 'Radial Velocity') AS \"Radial Velocity\", COUNT(*) FILTER (WHERE discoverymethod = 'Microlensing') AS \"Microlensing\", COUNT(*) FILTER (WHERE discoverymethod = 'Imaging') AS \"Imaging\", COUNT(*) FILTER (WHERE discoverymethod = 'Transit Timing Variations') AS \"Transit Timing Variations\", COUNT(*) FILTER (WHERE discoverymethod NOT IN ('Transit','Radial Velocity','Microlensing','Imaging','Transit Timing Variations')) AS \"Other\" FROM exoplanets WHERE discoverymethod IS NOT NULL",
+          "refId": "A"
+        }
+      ],
+      "title": "Discovery Methods (Full Catalog)",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Planet size-class distribution across the full NASA catalog. Rocky < 1.5 R\u2295 | Super-Earth 1.5\u20132.5 | Sub-Neptune 2.5\u20134 | Neptune-like 4\u201310 | Gas Giant > 10. LAMOST-observed hosts tend to have a higher fraction of gas giants due to the planet-metallicity correlation.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 8,
+        "y": 39
+      },
+      "id": 23,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) FILTER (WHERE pl_rade < 1.5) AS \"Rocky (<1.5 R\u2295)\", COUNT(*) FILTER (WHERE pl_rade >= 1.5 AND pl_rade < 2.5) AS \"Super-Earth (1.5-2.5)\", COUNT(*) FILTER (WHERE pl_rade >= 2.5 AND pl_rade < 4.0) AS \"Sub-Neptune (2.5-4)\", COUNT(*) FILTER (WHERE pl_rade >= 4.0 AND pl_rade < 10.0) AS \"Neptune-like (4-10)\", COUNT(*) FILTER (WHERE pl_rade >= 10.0) AS \"Gas Giant (>10)\" FROM exoplanets WHERE pl_rade IS NOT NULL",
+          "refId": "A"
+        }
+      ],
+      "title": "Planet Size Classes (Full Catalog)",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "celestiaops-timescaledb"
+      },
+      "description": "Confirmed exoplanets whose host stars lie within LAMOST\u2019s photometric range (V mag 10\u201317.8) and sky footprint (dec > \u221210\u00b0), sorted by V magnitude. These are the best candidates for cross-referencing with LAMOST spectroscopic data.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "HZ"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 50
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "\u2713 HZ": {
+                        "color": "green",
+                        "index": 0,
+                        "text": "\u2713 HZ"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Host Star"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 140
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Planet"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 160
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 16,
+        "y": 39
+      },
+      "id": 24,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "V Mag"
+          }
+        ]
+      },
+      "pluginVersion": "13.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "celestiaops-timescaledb"
+          },
+          "format": "table",
+          "rawSql": "SELECT hostname AS \"Host Star\", pl_name AS \"Planet\", ROUND(sy_vmag::numeric, 2) AS \"V Mag\", ROUND((sy_dist * 3.26156)::numeric, 1) AS \"Dist (ly)\", discoverymethod AS \"Method\", disc_year AS \"Year\", ROUND(st_teff::numeric, 0) AS \"Teff (K)\", ROUND(st_met::numeric, 3) AS \"[Fe/H]\", ROUND(pl_rade::numeric, 2) AS \"R\u2295\", ROUND(pl_eqt::numeric, 0) AS \"Eq Temp (K)\", CASE WHEN is_potentially_habitable THEN '\u2713 HZ' ELSE '' END AS \"HZ\" FROM exoplanets WHERE sy_vmag BETWEEN 10 AND 17.8 AND dec > -10 ORDER BY sy_vmag ASC LIMIT 50",
+          "refId": "A"
+        }
+      ],
+      "title": "Exoplanets in LAMOST Observable Range",
+      "type": "table"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 42,
+  "tags": [
+    "celestiaops",
+    "lamost",
+    "spectroscopy",
+    "astronomy"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-5y",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "CelestiaOps \u2014 LAMOST Stellar Spectroscopy",
+  "uid": "celestiaops-lamost",
+  "version": 1,
+  "weekStart": ""
+}

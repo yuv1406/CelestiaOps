@@ -1,10 +1,10 @@
 # CelestiaOps
 
-A self-hosted, production-grade exoplanet intelligence pipeline. CelestiaOps
+A self-hosted, production-grade exoplanet intelligence platform. CelestiaOps
 pulls confirmed exoplanet data from the NASA Exoplanet Archive on a daily
-schedule, detects what actually changed, stores it in TimescaleDB with full
-historical snapshots, and surfaces everything through a science-grade Grafana
-dashboard.
+schedule, enriches each host star with spectroscopic parameters from the LAMOST
+DR5 survey, stores everything in TimescaleDB with full historical snapshots, and
+surfaces it through two science-grade Grafana dashboards.
 
 It is, put plainly, a data engineering project about space — because if you
 have to build a pipeline, it might as well be pointed at something interesting.
@@ -48,24 +48,29 @@ powerful, but it has some quirks that make naive integration painful:
 ## Architecture
 
 ```
-NASA TAP API (ADQL over HTTP)
-        |
-        v
-  Apache Airflow
-  (orchestration, scheduling, retry logic)
-        |
-        v
-  NasaToPostgresOperator
-  (fetch -> checksum -> upsert)
-        |
-        v
-  TimescaleDB
-  (exoplanets + exoplanets_history hypertable)
-        |
-        v
-  Grafana
-  (provisioned dashboard, auto-refreshes every hour)
+NASA TAP API (ADQL)          VizieR TAP API (ADQL)
+       |                            |
+       v                            v
+  Apache Airflow          Apache Airflow
+  ingest_exoplanets       ingest_lamost_stars
+  (daily 02:00 UTC)       (weekly Mon 05:00 UTC)
+       |                            |
+       v                            v
+  NasaToPostgresOperator   LamostToPostgresOperator
+  (fetch → checksum → upsert)  (cone search → checksum → upsert)
+       |                            |
+       v                            v
+  TimescaleDB: exoplanets DB   TimescaleDB: lamost DB
+  (exoplanets + history)       (lamost_observations + history)
+            \                      /
+             v                    v
+               Grafana (port 3000)
+       Exoplanet Observatory  |  LAMOST Spectroscopy
+         (provisioned)        |    (provisioned)
 ```
+
+Both databases live in the same TimescaleDB container. Grafana connects to each
+via separate provisioned datasources.
 
 Everything runs in Docker. The CelestiaOps services (TimescaleDB, Grafana)
 join the existing `airflow-stack_default` network so Airflow workers can reach
@@ -79,14 +84,45 @@ them by container name without any extra configuration.
 |-----------|------|
 | Apache Airflow 3 | DAG orchestration, scheduling, retry logic |
 | Python 3.13 | Operator logic, checksum computation, data transformation |
-| TimescaleDB (PostgreSQL 16) | Primary store + time-series hypertable for snapshots |
+| TimescaleDB (PostgreSQL 16) | Primary store + time-series hypertables for snapshots |
 | Grafana 13 | Dashboards, auto-provisioned via config files |
 | Docker Compose | Container orchestration for the full stack |
-| NASA TAP API | Data source — ADQL queries over HTTP |
+| NASA TAP API | Exoplanet data source — ADQL queries over HTTP |
+| VizieR TAP API (CDS) | LAMOST DR5 source — cone-search ADQL queries over HTTP |
 
 ---
 
 ## DAGs
+
+### `ingest_lamost_stars` — Weekly, Monday at 05:00 UTC
+
+Enriches exoplanet host stars with LAMOST DR5 spectroscopic parameters.
+
+```
+ensure_lamost_db  -->  ingest_lamost_data  -->  log_stats
+```
+
+**ensure_lamost_db** runs `create_lamost_tables.sql` idempotently — creates the
+`lamost` database schema if it doesn't exist. Safe to re-run on every execution.
+
+**ingest_lamost_data** is the `LamostToPostgresOperator`. It:
+1. Reads all distinct hostnames from the `exoplanets` database
+2. Issues a cone-search ADQL query (5 arcsec radius) against the VizieR TAP
+   endpoint (`tapvizier.cds.unistra.fr`) for each host star, returning up to 5
+   spectra ranked by g-band SNR
+3. Respects a 0.3-second inter-request delay to stay within VizieR's rate limits
+4. Computes a SHA-256 checksum over Teff, logg, [Fe/H], and HRV for each observation
+5. Upserts into `lamost_observations` on `obsid`, skipping rows whose checksum
+   is unchanged
+6. Records sync metadata in `lamost_sync_state`
+
+**log_stats** pulls from XCom and logs matched stars, inserted and updated rows.
+
+**Schedule rationale:** Weekly (not daily). LAMOST DR5 is a static catalog
+release — daily runs would be 4,700+ no-op VizieR queries after the first sync.
+Weekly cadence still catches newly confirmed host stars added by `ingest_exoplanets`.
+
+---
 
 ### `ingest_exoplanets` — Daily at 02:00 UTC
 
@@ -172,6 +208,39 @@ TimescaleDB hypertable. One row per planet per weekly snapshot. Partitioned by
 One row per DAG. Tracks `last_sync_at`, `rows_fetched`, `rows_inserted`,
 `rows_updated` for operational visibility.
 
+---
+
+### `lamost_observations` (in the `lamost` database)
+
+One row per LAMOST observation matched to a NASA exoplanet host star.
+Primary key is `obsid` (LAMOST observation ID).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `obsid` | BIGINT PK | LAMOST observation ID |
+| `hostname` | TEXT | Matched NASA exoplanet host star name |
+| `obs_date` | TEXT | Observation date string |
+| `ra` / `dec` | DOUBLE | Coordinates (J2000) |
+| `teff` / `e_teff` | DOUBLE | Effective temperature and uncertainty (K) |
+| `logg` / `e_logg` | DOUBLE | Log surface gravity and uncertainty (cgs) |
+| `feh` / `e_feh` | DOUBLE | Metallicity [Fe/H] and uncertainty (dex) |
+| `hrv` / `e_hrv` | DOUBLE | Heliocentric radial velocity and uncertainty (km/s) |
+| `snr_g` / `snr_r` | DOUBLE | Signal-to-noise ratio in g-band and r-band |
+| `spec_class` | TEXT | STAR / GALAXY / QSO / UNKNOWN |
+| `spec_subclass` | TEXT | Spectral subclass (e.g. G2, K5, F9) |
+| `row_checksum` | TEXT | SHA-256 over Teff, logg, [Fe/H], HRV |
+| `ingested_at` / `updated_at` | TIMESTAMPTZ | Audit timestamps |
+
+### `lamost_obs_history`
+
+TimescaleDB hypertable. One row per observation per weekly snapshot, partitioned
+by `snapshot_time`. Retains the same 5-year window as `exoplanets_history`.
+
+### `lamost_sync_state`
+
+One row per LAMOST DAG run. Tracks `last_sync_at`, `stars_queried`,
+`obs_inserted`, `obs_updated`.
+
 ### Indexes
 
 - B-tree on `disc_year`, `discoverymethod`, `pl_eqt`, `updated_at`
@@ -201,6 +270,68 @@ WHERE exoplanets.row_checksum != EXCLUDED.row_checksum;
 
 A row that has not changed produces zero I/O beyond the conflict check. On a
 typical daily run, the vast majority of the 6,300 rows are untouched.
+
+---
+
+## Grafana Dashboards
+
+Grafana connects to two datasources — `CelestiaOps` (uid: `celestiaops-timescaledb`,
+database: `exoplanets`) and `CelestiaOps LAMOST` (uid: `celestiaops-lamost`,
+database: `lamost`) — both provisioned from `timescaledb.yaml` on container start.
+
+**Note on datasource provisioning:** Grafana hot-reloads dashboard JSON files
+but requires a container restart to register a *newly added* datasource entry.
+An existing datasource entry can be updated without restart; first-time additions
+cannot. Run `docker restart celestiaops_grafana` after modifying `timescaledb.yaml`.
+
+---
+
+## Grafana Dashboard — LAMOST Stellar Spectroscopy
+
+Auto-provisioned from `lamost_spectroscopy.json`. Uses the `celestiaops-lamost`
+datasource for LAMOST panels and falls back to `celestiaops-timescaledb` for
+the exoplanet context section at the bottom.
+
+The dashboard has 24 panels across five logical sections:
+
+### LAMOST Header Stats
+
+Six stat cards: total observations, distinct host stars covered, mean stellar
+Teff (K), mean metallicity [Fe/H] (dex), average g-band SNR, and count of
+high-confidence spectra (SNR > 20).
+
+### Spectral Classification
+
+Donut showing the LAMOST pipeline class breakdown (STAR / GALAXY / QSO /
+Unknown). Bar chart of the top 15 spectral subclasses (G2, K5, F9, etc.),
+filtered to stellar spectra with a non-empty subclass. Bar chart of observation
+counts binned by spectral type (M / K / G / F / A+) using the same temperature
+boundaries as the exoplanet dashboard.
+
+### Stellar Parameter Distributions
+
+Three bar charts: metallicity [Fe/H] binned from metal-poor (< −1.0) to
+metal-rich (> +0.5); surface gravity log g binned from Giants (< 2.0) to
+Main-Sequence (4.0–5.0); heliocentric radial velocity binned in 50 km/s steps
+from below −100 to above +100 km/s. The HRV spread reflects Galactic disk
+kinematics — stars at large |HRV| may belong to the thick disk or halo.
+
+### Best Observations Table
+
+Top 50 observations ranked by g-band SNR, with all spectroscopic columns
+(Teff ± uncertainty, log g ± uncertainty, [Fe/H], HRV, SNR g, SNR r, obs date,
+ObsID). SNR column is colour-coded: red (< 10), orange (10–20), green (> 20).
+All columns are filterable.
+
+### Exoplanet Context
+
+Six stat cards from the NASA catalog: total confirmed planets, habitable zone
+candidates, G-type host stars, multi-planet systems, nearest exoplanet in
+light-years, and count of planets whose host falls within LAMOST's observable
+range (V mag 10–17.8, dec > −10°). Two donut charts (discovery methods and
+planet size classes) from the full catalog. A filterable table of the
+brightest LAMOST-range exoplanet hosts sorted by V magnitude — the most
+practical cross-reference between the two datasets.
 
 ---
 
@@ -322,25 +453,31 @@ likely.
 CelestiaOps/
     dags/
         ingest_exoplanets.py       # Daily NASA TAP ingest
-        snapshot_history.py        # Weekly point-in-time snapshots
+        ingest_lamost_stars.py     # Weekly LAMOST DR5 spectral ingest
+        snapshot_history.py        # Weekly snapshots (both catalogs)
         test_ingest_exoplanets.py  # Test variant — writes CSV to results/
         test_snapshot_history.py   # Test variant — reads CSV, writes snapshot CSV
     plugins/
         operators/
-            nasa_to_postgres_operator.py  # Production operator
-            nasa_to_csv_operator.py       # Test operator (no DB required)
+            nasa_to_postgres_operator.py    # NASA production operator
+            nasa_to_csv_operator.py         # NASA test operator (no DB)
+            lamost_to_postgres_operator.py  # LAMOST production operator
     include/
         config/
-            settings.py    # Column lists, API URL, connection IDs, HZ bounds
+            settings.py         # NASA column lists, API URL, connection IDs, HZ bounds
+            lamost_settings.py  # VizieR endpoint, LAMOST table, cone radius, rate limit
         sql/
-            create_tables.sql      # Idempotent schema setup
-            upsert_exoplanets.sql  # Conditional upsert (checksum-gated)
+            create_tables.sql        # Exoplanet schema (idempotent)
+            create_lamost_tables.sql # LAMOST schema (idempotent)
+            upsert_exoplanets.sql    # Conditional upsert (checksum-gated)
+            upsert_lamost.sql        # LAMOST upsert on obsid (checksum-gated)
     grafana/
         provisioning/
-            datasources/timescaledb.yaml  # Auto-provisions TimescaleDB connection
+            datasources/timescaledb.yaml  # Two datasources: exoplanets + lamost DBs
             dashboards/celestiaops.yaml   # Dashboard provider config
         dashboards/
-            exoplanet_overview.json       # Full observatory dashboard
+            exoplanet_overview.json    # Exoplanet Observatory dashboard (25 panels)
+            lamost_spectroscopy.json   # LAMOST Stellar Spectroscopy dashboard (24 panels)
     docker-compose.yml   # TimescaleDB + Grafana, joins airflow-stack network
     requirements.txt
     mission_log.md       # Architecture decisions and incident record
@@ -385,9 +522,11 @@ volumes:
   - ./include:/opt/airflow/include
 ```
 
-### Create the Airflow Connection
+### Create the Airflow Connections
 
-In the Airflow UI under Admin > Connections, add:
+In the Airflow UI under Admin > Connections, add two connections:
+
+**Exoplanets database:**
 
 | Field | Value |
 |-------|-------|
@@ -399,14 +538,30 @@ In the Airflow UI under Admin > Connections, add:
 | Password | `celestia` |
 | Port | `5432` |
 
+**LAMOST database:**
+
+| Field | Value |
+|-------|-------|
+| Connection Id | `celestiaops_lamost` |
+| Connection Type | Postgres |
+| Host | `celestiaops_timescaledb` |
+| Database | `lamost` |
+| Login | `celestia` |
+| Password | `celestia` |
+| Port | `5432` |
+
 ### First Run
 
-Trigger `ingest_exoplanets` manually. It will create the schema on first run,
-then fetch and load the full catalog. Expect around 15 – 20 seconds for the
-NASA API request and another few seconds for the upsert.
+Trigger `ingest_exoplanets` manually first. It creates the schema on first run,
+then fetches and loads the full catalog (~15–20 seconds for the API request,
+a few seconds for the upsert).
 
-Open `http://localhost:3000` (admin / celestia) and the dashboard will be
-waiting.
+Then trigger `ingest_lamost_stars`. It reads all host star names from the
+exoplanets database, queries VizieR in a cone-search loop (~4,700 requests at
+0.3s each — expect 25–30 minutes on first run), and loads the matched spectra.
+
+Open `http://localhost:3000` (admin / celestia). Both dashboards will be
+provisioned and waiting.
 
 ---
 
@@ -459,3 +614,26 @@ a single value to compare per row.
 datasources and dashboards are version-controlled, reproducible, and
 automatically applied on container start. There is no manual click-through to
 reproduce the setup on a fresh deployment.
+
+**Why a separate Grafana datasource for the LAMOST database?** Grafana's
+PostgreSQL plugin connects to one database per datasource. Since LAMOST
+observations live in a separate `lamost` database (not a schema inside
+`exoplanets`), a second datasource entry is required. Panels within a single
+dashboard can use different datasources, so the LAMOST dashboard freely mixes
+LAMOST panels (`celestiaops-lamost`) with exoplanet context panels
+(`celestiaops-timescaledb`) without needing cross-database SQL or FDW.
+
+**Why not cross-database joins for the LAMOST dashboard?** PostgreSQL does not
+support cross-database queries without the `dblink` extension or a foreign data
+wrapper. Both approaches add complexity and fragility. The LAMOST and exoplanet
+datasets share `hostname` as a key, but the cross-reference panels in the
+dashboard are intentionally context panels — they do not need a live join.
+Independent queries per datasource are simpler, more readable, and easier to
+debug when something goes wrong.
+
+**Why weekly for LAMOST ingestion?** LAMOST DR5 is a static catalog release,
+not a live feed. After the first full sync (~1,681 observations across ~1,003
+host stars), subsequent runs only pick up new host stars added by
+`ingest_exoplanets`. Daily runs would issue ~4,700 VizieR cone-search requests
+per day with essentially no new results. Weekly balances freshness against
+unnecessary load on the VizieR service.

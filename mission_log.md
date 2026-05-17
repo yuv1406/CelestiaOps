@@ -44,3 +44,43 @@ Directories: `/data/celestiaops/{timescaledb,opensearch,grafana}`
 - `nasa_to_postgres_operator.py` — computes habitability at ingest time (moved from OpenSearch indexer)
 - `settings.py` — removed `OPENSEARCH_CONN_ID`, `OPENSEARCH_INDEX`
 - Grafana now uses its built-in PostgreSQL datasource — no plugins needed
+
+---
+
+## 2026-05-17 — LAMOST DR5 Pipeline Added
+
+**Decision:** Added a full LAMOST spectral ingestion pipeline alongside the existing NASA exoplanet pipeline.
+
+**Why:** LAMOST DR5 (V/164/stellar5, 5.3M rows) contains Teff, logg, [Fe/H], and HRV for FGK stars — enriching exoplanet host stars with spectroscopic parameters that NASA TAP doesn't provide. Coverage is northern sky (dec > −10°), V ≈ 10–17.8 mag; matched ~1,003 of 4,708 host stars on first run.
+
+**What changed:**
+- `plugins/operators/lamost_to_postgres_operator.py` — VizieR TAP cone search (2-arcsec radius) per host star, SHA-256 checksum upsert into `lamost` TimescaleDB database
+- `include/config/lamost_settings.py` — VizieR endpoint, LAMOST table, columns, cone radius, rate-limit delay
+- `include/sql/create_lamost_tables.sql` — `lamost_observations` table, `lamost_sync_state`, `lamost_obs_history` hypertable (partitioned by `snapshot_time`)
+- `include/sql/upsert_lamost.sql` — upsert on `obsid`, skip-on-unchanged via checksum
+- `dags/ingest_lamost_stars.py` — `ensure_lamost_db → ingest_lamost_data → log_stats`
+
+**Schedule decision:** Weekly (Monday 05:00 UTC), not daily. LAMOST DR5 is a static catalog release — daily runs would be 4,700+ no-op VizieR queries after the first sync. Weekly cadence still catches newly discovered host stars added by `ingest_exoplanets`.
+
+---
+
+## 2026-05-17 — LAMOST CSV Test Operator Added
+
+**Decision:** Added `LamostToCsvOperator` and `test_ingest_lamost_stars` DAG before committing to live database writes.
+
+**Why:** Same validation pattern used for NASA (`NasaToCsvOperator`). Fetches from VizieR and writes to `results/lamost_<run_id>.csv` with no DB dependency. CSV was validated before running the real ingest — 1,681 rows, 1,003 unique host stars, 0 errors, all `spec_class = STAR`.
+
+---
+
+## 2026-05-17 — snapshot_history Merged to Cover Both Catalogs
+
+**Decision:** Extended `snapshot_history` DAG to snapshot both `exoplanets_history` and `lamost_obs_history` in two parallel branches. Removed the separate `snapshot_lamost_history` DAG.
+
+**Why:** One DAG is simpler to monitor and maintain. The branches are independent — a LAMOST freshness failure won't block the exoplanets snapshot.
+
+**Schedule moved:** Sunday 06:00 → Monday 08:00 UTC. LAMOST ingest runs Monday 05:00; the 3-hour buffer ensures it finishes before the snapshot gate checks `lamost_sync_state`. Exoplanets freshness gate (36h) is unaffected since `ingest_exoplanets` runs daily at 02:00.
+
+**Weekly pipeline order (Mondays):**
+- 02:00 — `ingest_exoplanets` (daily, unchanged)
+- 05:00 — `ingest_lamost_stars` (weekly)
+- 08:00 — `snapshot_history` (both branches)
